@@ -1,14 +1,15 @@
 
 var res = {
 
+    background:"images/background.png"
 };
 
 var res2 = {
 
 };
 
-var _Images = {};
-var _Sound = {};
+var _images = {};
+var _sound = {};
 
 function loadSources(callback) {
 
@@ -25,18 +26,18 @@ function loadSources(callback) {
     }
 
     for (var src in res2) {
-        _Sound[src] = new Audio();
-        _Sound[src].src = res2[src];
+        _sound[src] = new Audio();
+        _sound[src].src = res2[src];
     }
     for (var src in res) {
 
-        _Images[src] = new Image();
-        _Images[src].onload = function() {
+        _images[src] = new Image();
+        _images[src].onload = function() {
             if (++loadedImages >= numImages) {
                     callback();
             }else{
             }
         };
-        _Images[src].src = res[src];
+        _images[src].src = res[src];
     }
 }
