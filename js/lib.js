@@ -26,14 +26,17 @@
         this.sourceRect=new createjs.Rectangle(x,y,width,height);
     }
     Item.prototype.onPress=function(e){
+        this.ispress=1;
         if(this.mousepress!=null)
         this.mousepress();
     }
     Item.prototype.onMouseOver=function(e){
+        this.isover=1;
         if(this.mouseover!=null)
         this.mouseover();
     }
     Item.prototype.onMouseOut=function(e){
+        this.isout=1;
         if(this.mouseout!=null)
         this.mouseout();
     }
