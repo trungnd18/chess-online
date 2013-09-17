@@ -21,13 +21,14 @@
         this.point={x:x,y:y};
         this.width=this.image.width;
         this.height=this.image.height;
+        this.ispress=0;
 
     }
     Item.prototype.setSourceRect= function(x,y,width,height){
         this.sourceRect=new createjs.Rectangle(x,y,width,height);
     }
     Item.prototype.onPress=function(e){
-        this.ispress=1;
+
         if(this.mousepress!=null)
         this.mousepress(e);
     }
