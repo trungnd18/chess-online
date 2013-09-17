@@ -1,10 +1,8 @@
 (function (window) {
-    /*
-     L?p kh?i t?o các item cho game
-     */
+    var countpress=0;
     function Game(canvas,stage) {
         var chessArray=
-            [[6,4,2,3,10,3,2,4,6],
+            [   [6,4,2,3,10,3,2,4,6],
                 [0,0,0,0,0,0,0,0,0],
                 [0,5,0,0,0,0,0,5,0],
                 [1,0,1,0,1,0,1,0,1],
@@ -16,20 +14,40 @@
                 [-6,-4,-2,-3,-10,-3,-2,-4,-6]
             ];
         var chessBitmap=[];
+        var self=this;
         this.canvas=canvas;
         this.stage = stage;
         this.ease =  createjs.Ease;
         this._sound={};
         this._images={};
+        this.canvas.onmousemove = canvas_mousemove;
+        this.canvas.onmousedown=canvas_mousedown;
+        this.canvas.onmouseup=canvas_mouseup;
+        function canvas_mousemove(e) {
+            targetX = e.pageX - canvas.offsetLeft;
+            targetY = e.pageY - canvas.offsetTop;
+        }
+        function canvas_mousedown(e){
+            targetX = e.pageX - canvas.offsetLeft;
+            targetY = e.pageY - canvas.offsetTop;
+        }
+        function canvas_mouseup(e){
+            targetX = e.pageX - canvas.offsetLeft;
+            targetY = e.pageY - canvas.offsetTop;
+        }
+
         this.onStart=function(){
-            this.isMove;
+            this.isSelect=0;
+            this.isMove=0;
+            this.movefrom={};
+            this.moveto={};
+            this.dfchess={};
+            this.chessrush=new Array();
             displayMenu = new createjs.Container();
             this.stage.enableMouseOver(10);
             this.stage.mouseMoveOutside = true;
             var item = new Item(this._images.background,0,0);
             this.stage.addChild(item);
-            this.canvas.onmousemove = canvas_mousemove;
-            this.canvas.onmousedown=canvas_mousedown;
             this.chess();
             createjs.Sound.registerPlugin(createjs.HTMLAudioPlugin);
             createjs.Ticker.addListener(this);
@@ -38,17 +56,12 @@
         }
         this.tick=function(){
             this.stage.update();
+            if(this.isSelect){
+
+                this.isSelect=0;
+            }
         }
-        function canvas_mousemove(e) {
-            targetX = e.pageX - canvas.offsetLeft;
-            targetY = e.pageY - canvas.offsetTop;
-        }
-        function canvas_mousedown(e){
-            targetX = e.pageX - canvas.offsetLeft;
-            targetY = e.pageY - canvas.offsetTop;
-            console.log(targetX+"|"+targetY);
-        }
-        this.chess=function(){
+       this.chess=function(){
             var item = new Item(this._images.table,100,50);
             item.scaleX=0.8 ;
             item.scaleY=0.8;
@@ -82,13 +95,14 @@
                         item.scaleX=0.5 ;
                         item.scaleY=0.5;
                         item.count= chessArray[i][j];
+                        item.page={x:i,y:j};
                         this.stage.addChild(item);
-                        chessBitmap.push(item);
+                        chessBitmap[i][j]=item;
                     }
                 }
             }
         }
-        this.onLoad=function(){
+       this.onLoad=function(){
             var i = 0, j = 0;
             var loadedImages = 0;
             var numImages = 0;
@@ -119,20 +133,43 @@
                 this._images[src].src = res[src];
             }
         }
-        function mouseover(){
-            this.scaleX=0.6;
-            this.scaleY=0.6;
+       this.createMove=function(chess){
 
-        }
-        function mouseout(){
-            if(!this.ispress){
-                this.scaleX=0.5;
-                this.scaleY=0.5;
-            }
-        }
-        function mousepress(){
+       }
+       var mouseover=function(){
             this.scaleX=0.6;
             this.scaleY=0.6;
+       }
+       var mouseout=function(){
+            this.scaleX=0.5;
+            this.scaleY=0.5;
+       }
+       var mousepress=function (evt){
+           this.scaleX=0.5;
+           this.scaleY=0.5;
+           self.isSelect=1;
+           self.movefrom=this.page;
+           self.dfchess=this;
+           if(!jQuery.isEmptyObject( self.chessrush)){
+               for(var i=0;i< self.chessrush.length;i++){
+                   self.stage.removeChild(self.chessrush[i]);
+               }
+               self.chessrush=new Array();
+           }
+           var myObjTwo = jQuery.extend(true, {}, this);
+           myObjTwo.x=100;
+           myObjTwo.scaleX=0.5;
+           myObjTwo.scaleY=0.5;
+           myObjTwo.alpha=0.4;
+           self.chessrush.push(myObjTwo);
+           self.stage.addChild(myObjTwo);
+
+       }
+    }
+    function KnightMove(chess){
+        for(var i=0;i<10;i++){
+            for(var j=0;j<9;j++){
+            }
         }
     }
 
@@ -158,7 +195,6 @@
 
 
     };
-
     var res2 = {
 
     };

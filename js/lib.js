@@ -18,6 +18,7 @@
         this.snapToPixel = true;
         this.x = x;
         this.y = y;
+        this.point={x:x,y:y};
         this.width=this.image.width;
         this.height=this.image.height;
 
@@ -28,17 +29,17 @@
     Item.prototype.onPress=function(e){
         this.ispress=1;
         if(this.mousepress!=null)
-        this.mousepress();
+        this.mousepress(e);
     }
     Item.prototype.onMouseOver=function(e){
         this.isover=1;
         if(this.mouseover!=null)
-        this.mouseover();
+        this.mouseover(e);
     }
     Item.prototype.onMouseOut=function(e){
         this.isout=1;
         if(this.mouseout!=null)
-        this.mouseout();
+        this.mouseout(e);
     }
     window.Item = Item;
 }(window)) ;

@@ -30,15 +30,7 @@
             var stage = new createjs.Stage(canvas);
             var game= new  Game(canvas,stage);
 
-            function canvas_mousemove(e) {
-                targetX = e.pageX - canvas.offsetLeft;
-                targetY = e.pageY - canvas.offsetTop;
-            }
-            function canvas_mousedown(e){
-                targetX = e.pageX - canvas.offsetLeft;
-                targetY = e.pageY - canvas.offsetTop;
-                console.log(targetX+"|"+targetY);
-                }
+
             window.addEventListener('resize',resize, false);
             resize();
             game.onLoad();
