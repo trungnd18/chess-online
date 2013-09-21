@@ -20,5 +20,5 @@
 
         }
     }
-    window.Chess = Chess;
+    window.Player =Player;
 }(window)) ;

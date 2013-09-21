@@ -1,7 +1,4 @@
 (function (window) {
-    /*
-     Lớp khởi tạo các item cho game
-     */
     function Item(img, x, y,sourceRect,mouseover,mouseout,mousepress) {
         this.initialize(img, x, y);
         if(sourceRect!=null){
@@ -43,4 +40,38 @@
         this.mouseout(e);
     }
     window.Item = Item;
+}(window)) ;
+(function (window) {
+
+    function Text(text, x, y,font,color,mouseover,mouseout,mousepress) {
+        this.initialize(text, x, y,font,color);
+        this.mouseover=mouseover;
+        this.mouseout=mouseout;
+        this.mousepress=mousepress;
+    }
+    Text.prototype = new createjs.Text();
+    Text.prototype.Text_initialize = Text.prototype.initialize;
+    Text.prototype.initialize = function(text, x, y,font,color) {
+        this.Text_initialize(text, font,color);
+        this.x = x;
+        this.y = y;
+        this.ispress=0;
+        console.log(this);
+    }
+    Text.prototype.onPress=function(e){
+
+        if(this.mousepress!=null)
+            this.mousepress(e);
+    }
+    Text.prototype.onMouseOver=function(e){
+        this.isover=1;
+        if(this.mouseover!=null)
+            this.mouseover(e);
+    }
+    Text.prototype.onMouseOut=function(e){
+        this.isout=1;
+        if(this.mouseout!=null)
+            this.mouseout(e);
+    }
+    window.Text = Text;
 }(window)) ;

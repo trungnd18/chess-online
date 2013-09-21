@@ -1,6 +1,10 @@
 (function (window) {
 
-    function Game(canvas,stage) {
+    function Game(canvas,stage,socket) {
+        var socket=socket;
+        socket.on('online',function(data){
+            console.log(data);
+        })
         var countpress=0;
         var chessArray=
             [   [6,4,2,3,10,3,2,4,6],
@@ -37,7 +41,6 @@
             targetX = e.pageX - canvas.offsetLeft;
             targetY = e.pageY - canvas.offsetTop;
         }
-
         this.onStart=function(){
             this.isSelect=0;
             this.isMove=0;
@@ -45,21 +48,43 @@
             this.moveto={};
             this.dfchess={};
             this.chessrush=new Array();
-            displayMenu = new createjs.Container();
+            this.player= new Player();
+            this.player.color=1;
+            this.nowplayer=this.player;
             this.stage.enableMouseOver(10);
             this.stage.mouseMoveOutside = true;
             var item = new Item(this._images.background,0,0);
             this.stage.addChild(item);
-            this.chess();
+            var text = new Text("Cờ tướng online",10,10," 46px Patrick Hand ","black");
+            this.stage.addChild(text);
+            socket.on('room',function(data){
+                var text = new Text(data,100,100,"46px Patrick Hand ","black");
+                stage.addChild(text);
+          })
+            var add = this.dom('listroom',100,-400);
+            stage.addChild(add) ;
+            var add = this.dom('add',100,-50);
+            stage.addChild(add) ;
+            var add = this.dom('auto',250,-50);
+            stage.addChild(add);
+            var add = this.dom('chatroom',600,-480);
+            stage.addChild(add) ;
+//            this.chess();
             createjs.Sound.registerPlugin(createjs.HTMLAudioPlugin);
             createjs.Ticker.addListener(this);
             createjs.Ticker.useRAF = true;
             createjs.Ticker.setFPS(60);
         }
+        this.dom=function(id,x,y){
+            var form = document.getElementById(id);
+            var add = new createjs.DOMElement(form);
+            add.x=x;
+            add.y=y;
+            return add;
+        }
         this.tick=function(){
             this.stage.update();
             if(this.isSelect){
-
                 this.isSelect=0;
             }
         }
@@ -72,12 +97,15 @@
             item.scaleX=0.8 ;
             item.scaleY=0.8;
             this.stage.addChild(item);
+            this.loadChess(chessArray);
+        }
+        this.loadChess=function(chessArr){
             for(var i=0;i<10;i++){
                 for(var j=0;j<9;j++){
                     var imagechess;
 //                    chessBitmap[i][j]=null;
-                    if(chessArray[i][j]!=0){
-                        switch (chessArray[i][j]) {
+                    if(chessArr[i][j]!=0){
+                        switch (chessArr[i][j]) {
                             case 1: imagechess=this._images.pawn_dark;break;
                             case -1: imagechess=this._images.pawn_red;break;
                             case 2: imagechess=this._images.elephan_dark;break;
@@ -97,7 +125,7 @@
                         var item = new Item(imagechess,43*j+85,44*i+38,null,mouseover,mouseout,mousepress);
                         item.scaleX=0.5 ;
                         item.scaleY=0.5;
-                        item.count= chessArray[i][j];
+                        item.count= chessArr[i][j];
                         item.page={x:j,y:i};
                         this.stage.addChild(item);
                         chessBitmap[i+"|"+j]=item;
@@ -105,7 +133,7 @@
                 }
             }
         }
-        this.onLoad=function(){
+        this.onLoad=function(callback){
             var i = 0, j = 0;
             var loadedImages = 0;
             var numImages = 0;
@@ -128,7 +156,7 @@
                 var self=this;
                 this._images[src].onload = function() {
                     if (++loadedImages >= numImages) {
-                        self.onStart();
+                       callback();
                         console.log("Load complete");
                     }else{
                     }
@@ -148,32 +176,36 @@
             this.scaleY=0.5;
         }
         var mousepress=function (evt){
-            if(!jQuery.isEmptyObject( self.chessrush)){
-                for(var i=0;i< self.chessrush.length;i++){
-                    self.stage.removeChild(self.chessrush[i]);
+            if(self.nowplayer.color/this.count>0){
+                if(!jQuery.isEmptyObject( self.chessrush)){
+                    for(var i=0;i< self.chessrush.length;i++){
+                        self.stage.removeChild(self.chessrush[i]);
+                    }
+                    self.chessrush=new Array();
                 }
-                self.chessrush=new Array();
-            }
-            this.scaleX=0.5;
-            this.scaleY=0.5;
-           if(!this.ispress){
-               self.isSelect=1;
-               self.movefrom=this.page;
-               self.dfchess=this;
-               switch(Math.abs(this.count)){
-                   case 10: KingMove(this);break;
-                   case 1: PawnMove(this);break;
-                   case 2: ElephanMove(this);break;
-                   case 3: BishopMove(this);break;
-                   case 4: KnightMove(this);break;
-                   case 5: CannonMove(this);break;
-                   case 6: RookMove(this);break;
+                this.scaleX=0.5;
+                this.scaleY=0.5;
+               if(!this.ispress){
+                   self.isSelect=1;
+                   self.movefrom=this.page;
+                   self.dfchess=this;
+                   switch(Math.abs(this.count)){
+                       case 10: KingMove(this);break;
+                       case 1: PawnMove(this);break;
+                       case 2: ElephanMove(this);break;
+                       case 3: BishopMove(this);break;
+                       case 4: KnightMove(this);break;
+                       case 5: CannonMove(this);break;
+                       case 6: RookMove(this);break;
+                   }
+                   this.ispress=1;
+               }else{
+                   self.isSelect=0;
+                   this.ispress=0;
                }
-               this.ispress=1;
-           }else{
-               self.isSelect=0;
-               this.ispress=0;
-           }
+            }else{
+                alert("Không thể");
+            }
        }
         function KnightMove(chess){
             for(var i=0;i<10;i++){
@@ -288,7 +320,7 @@
                 }
             }
         }
-        function  BishopMove(chess){
+        function BishopMove(chess){
            if(chess.count<0){
                if(Math.pow(4-chess.page.x,2)+Math.pow(8-chess.page.y,2)!=1){
                    for(var i=7;i<10;i++){
@@ -404,6 +436,10 @@
             myObjTwo.alpha=0.4;
             myObjTwo.page={x:j,y:i};
             myObjTwo.mousepress=function(){
+                socket.emit("chess",{
+                    from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
+                    to:{x:this.x,y:this.y,count:this.count,page:this.page}
+                });
                 if(chessArray[this.page.y][this.page.x]!=0){
                     var tem= chessBitmap[this.page.y+"|"+this.page.x];
                     stage.removeChild(tem);
@@ -416,14 +452,12 @@
                 chessArray[this.main.page.y][this.main.page.x]=0;
                 this.main.page=this.page;
                 chessArray[this.main.page.y][this.main.page.x]=this.main.count;
-
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
                         self.stage.removeChild(self.chessrush[i]);
                     }
                     self.chessrush=new Array();
                 }
-
             }
             self.chessrush.push(myObjTwo);
             self.stage.addChild(myObjTwo);

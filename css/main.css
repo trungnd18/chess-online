@@ -8,8 +8,7 @@
 :-webkit-full-screen h1{ color: wheat; }
 
 #canvas{
-    cursor:url(../../images/cursor.png);
-    cursor:url(../../images/cursor.cur);
+
     background: grey;
     width: 100%;
     height: 100%;
@@ -53,4 +52,7 @@ body{
     margin: 0;
     padding: 0;
     overflow: hidden;
+    cursor:url(cursor.png),url(cursor.cur),auto;
+    cursor:url(cursor.png),url(cursor.cur),pointer ;
+    font: Patrick Hand SC;
 }
