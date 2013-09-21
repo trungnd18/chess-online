@@ -1,7 +1,13 @@
+var socket = io.connect('https://chat-nodejs-c9-nobody122.c9.io');
+function addRoom(id){
+    if(id==null) alert("Gặp lỗi, không thể vào phòng ");
+    else{
+        socket.emit('joinroom',{id:id});
+    }
+}
 $(function(){
     var count=15;
     var reconnect=0;
-    var socket = io.connect('https://chat-nodejs-c9-nobody122.c9.io');
     var username;
     var roomname;
     var roomstatus="trống";
@@ -37,9 +43,14 @@ $(function(){
         console.log("trung");
         return false;
     })
-    function updateRoom(r,u,s){
-        $("#listroom table").append("<tr reg='room'><td reg='name'>"+r+"</td><td>"+u+"</td><td>" +
-            "<a>Xin chào</a></td></tr>");
+
+    function updateRoom(r,u,s,id){
+        if(id!=null)
+        $("<tr reg='room'><td reg='name'>"+r+"</td><td>"+u+"</td><td>" +
+            "<a onclick=\"addRoom('"+id+"')\">Vào phòng</a></td></tr>").hide().appendTo("#listroom table").fadeIn(1000);
+        else
+            $("<tr reg='room'><td reg='name'>"+r+"</td><td>"+u+"</td><td>" +
+                "<a onclick=\"addRoom()\">Vào phòng</a></td></tr>").hide().appendTo("#listroom table").fadeIn(1000);
     }
     function updateMessage(m){
         $("#content ul").append(m);
@@ -61,15 +72,17 @@ $(function(){
             }
         });
 //            var socket=io.connect('127.0.0.1:8080');
+    socket.on('callback',function(data){
+        alert(data.message);
+    })
     socket.on('user_online',function(data){
-        console.log(data.id);
         $("span#count").text(data.count_user);
     })
     socket.on('message',function(data){
         updateMessage(data.message);
     })
     socket.on('updateroom',function(data){
-        updateRoom(data.room,data.name,"trống");
+        updateRoom(data.room,data.name,"trống",data.id);
     })
     socket.on('connect_failed', function () {
         alert("Can't connect");
