@@ -17,6 +17,8 @@ $(function(){
             username=$("#username").val().trim();
             var password= hex_md5($("#password").val().trim());
             socket.emit('register',{username:username,password:password});
+        }else{
+            alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
         }
     })
     $("#login").click(function(){
@@ -54,9 +56,9 @@ $(function(){
                     $("#content ul").html("");
                 }else{
                     if($("#message").val().trim().length>0){
-                    socket.emit('message',{message:'<li><span class="label label-info" >'+username+'</span>: '+$("#message").val()+"<br></li>"});
-                    updateMessage("<li><span class='label label-success' >"+$("#username").val()+"</span> : "+$("#message").val()+"<br></li>");
-                    $("#message").val("");
+                        socket.emit('message',{message:'<li><span class="label label-info" >'+username+'</span>: '+$("#message").val()+"<br></li>"});
+                        updateMessage("<li><span class='label label-success' >"+$("#username").val()+"</span> : "+$("#message").val()+"<br></li>");
+                        $("#message").val("");
                     }
                 }
             }
