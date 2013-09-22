@@ -7,7 +7,6 @@
        		$db = $mongo->selectDB('quac');
        		$collection = $db->selectCollection('user');
             if(isset($_POST['username'])&&isset($_POST['password'])){
-
                         if($_POST['do']=="login"){
                             $info = $collection->find(array('username'=>$_POST['username']))->limit(1);
                             $users = iterator_to_array($info);
