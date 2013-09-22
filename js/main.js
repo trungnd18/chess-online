@@ -23,6 +23,8 @@
         var self=this;
         this.canvas=canvas;
         this.stage = stage;
+        this.domelement= new createjs.Container();
+        this.tablechess=new craetejs.Container();
         this.ease =  createjs.Ease;
         this._sound={};
         this._images={};
@@ -62,11 +64,12 @@
                 stage.addChild(text);
           })
             var add = this.dom('listroom',100,-400);
-            stage.addChild(add) ;
+            this.domelement.addChild(add);
             var add = this.dom('add',100,-50);
-            stage.addChild(add) ;
+            this.domelement.addChild(add);
             var add = this.dom('auto',250,-50);
-            stage.addChild(add);
+            this.domelement.addChild(add);
+            stage.addChild(this.domelement);
             var add = this.dom('chatroom',600,-480);
             stage.addChild(add) ;
 //            this.chess();
@@ -88,7 +91,8 @@
                 this.isSelect=0;
             }
         }
-        this.chess=function(){
+        this.chess=function(array){
+            if(array==null) array=chessArray;
             var item = new Item(this._images.table,100,50);
             item.scaleX=0.8 ;
             item.scaleY=0.8;
@@ -97,7 +101,7 @@
             item.scaleX=0.8 ;
             item.scaleY=0.8;
             this.stage.addChild(item);
-            this.loadChess(chessArray);
+            this.loadChess(array);
         }
         this.loadChess=function(chessArr){
             for(var i=0;i<10;i++){
@@ -444,7 +448,6 @@
                     var tem= chessBitmap[this.page.y+"|"+this.page.x];
                     stage.removeChild(tem);
                     chessBitmap[this.page.y+"|"+this.page.x]=null;
-                    console.log("Ăn");
                 }
                 this.main.ispress=0;
                 this.main.x=this.x;

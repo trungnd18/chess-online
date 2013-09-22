@@ -11,6 +11,9 @@ $(function(){
     var username;
     var roomname;
     var roomstatus="trống";
+    var canvas=document.getElementById("canvas");
+    var stage = new createjs.Stage(canvas);
+    var game= new  Game(canvas,stage,socket);
     $("#name").modal("show");
     $("#register").click(function(){
         if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
@@ -75,11 +78,18 @@ $(function(){
             $("#room").modal("hide");
         }
         if(data.joinroom==1){
-
+            game.domelement.visible=0;
+              game.chess();
         }
         if(data.register ==1 ){
             $("#barname").text($("#username").val());
             $("#name").modal("hide");
+        }
+        if(data.userin==1){
+            game.domelement.visible=0;
+            game.chess();
+        }else{
+            game.domelement.visible=1;
         }
     })
     socket.on('user_online',function(data){
@@ -114,9 +124,7 @@ $(function(){
             count--;
         }
     },1000);
-    var canvas=document.getElementById("canvas");
-    var stage = new createjs.Stage(canvas);
-    var game= new  Game(canvas,stage,socket);
+
     window.addEventListener('resize',resize, false);
     resize();
     game.onLoad(function(){
