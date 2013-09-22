@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta content="text/html" charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,6 +16,7 @@
     <!--<script src="http://code.createjs.com/easeljs-0.6.1.min.js"></script>-->
     <!--<script type="text/javascript" src="js/min/jquery.min.js"></script>-->
     <script type="text/javascript" src='js/server/socket.io.js'></script>
+    <script type="text/javascript" src='js/min/md5.js'></script>
     <script type="text/javascript" src="js/min/tweenjs.min.js"></script>
     <script type="text/javascript" src="js/min/preloadjs-NEXT.min.js"></script>
     <script type="text/javascript" src="js/min/soundjs-NEXT.min.js"></script>
@@ -55,7 +56,7 @@
 </div>
 <div id="name" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-header">
-        <h3 id="myModalLabel">Tạo username</h3>
+        <h3 id="myModalLabel">Đăng nhập</h3>
     </div>
     <div class="modal-body">
         <form class="form-horizontal">
@@ -65,10 +66,18 @@
                     <input type="text" id="username" >
                 </div>
             </div>
+            <div class="control-group">
+                <label class="control-label" >Password</label>
+                <div class="controls">
+                    <input type="password" id="password" >
+                </div>
+            </div>
         </form>
     </div>
     <div class="modal-footer">
-        <button class="btn btn-primary" id="addname">Join</button>
+        <button href="#" class="btn" id='singup'>Đăng ký</button>
+        <button class="btn btn-primary" id="singin">Join</button>
+
     </div>
 </div>
 <div id="room" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -87,7 +96,7 @@
         </form>
     </div>
     <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">Close</a>
+        <button href="#" class="btn" data-dismiss="modal">Close</button>
         <button class="btn btn-primary" id="createroom">Create</button>
     </div>
 </div>

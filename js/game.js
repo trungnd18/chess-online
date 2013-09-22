@@ -12,38 +12,29 @@ $(function(){
     var roomname;
     var roomstatus="trống";
     $("#name").modal("show");
-    $("#addname").click(function(){
-        if($("#username").val().trim().length>4){
-            username=$("#username").val();
-            socket.emit("username",{name:username}) ;
-            $("#barname").text($("#username").val());
-            $("#name").modal("hide");
+    $("#singup").click(function(){
+        if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
+
+        }
+    })
+    $("#singin").click(function(){
+        if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
+            username=$("#username").val().trim();
+            var password= hex_md5($("#password").val().trim());
+            socket.emit('login',{username:username,password:password});
+
         }else{
-            alert("Username không được nhỏ hơn 4 ký tự");
+            alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
         }
     }) ;
     $("#createroom").click(function(){
-        if($("#nameroom").val().trim().length>4){
+        if($("#nameroom").val().trim().length>=4){
             roomname=$("#nameroom").val();
             socket.emit("createroom",{room:roomname});
-            updateRoom(roomname,username,roomstatus);
-            $("#room").modal("hide");
         }else{
-            alert("roomname không được nhỏ hơn 4");
+            alert("Tên phòng không được nhỏ hơn 4 ký tự");
         }
     }) ;
-
-    function connect(){
-    }
-    $("tr a").click(function(){
-         console.log("trung");
-        return false;
-    })
-    $("tr a").click(function(){
-        console.log("trung");
-        return false;
-    })
-
     function updateRoom(r,u,s,id){
         if(id!=null)
         $("<tr reg='room'><td reg='name'>"+r+"</td><td>"+u+"</td><td>" +
@@ -61,9 +52,6 @@ $(function(){
                     $("#content ul").html("");
                 }else{
                     if($("#message").val().trim().length>0){
-                    var date= new Date().getTime();
-                    var time= new Date(date);
-                    console.log($("#username").val()+': '+$("#message").val());
                     socket.emit('message',{message:'<li><span class="label label-info" >'+username+'</span>: '+$("#message").val()+"<br></li>"});
                     updateMessage("<li><span class='label label-success' >"+$("#username").val()+"</span> : "+$("#message").val()+"<br></li>");
                     $("#message").val("");
@@ -73,7 +61,18 @@ $(function(){
         });
 //            var socket=io.connect('127.0.0.1:8080');
     socket.on('callback',function(data){
-        alert(data.message);
+       if(data.message!=null) alert(data.message);
+        if(data.login==1){
+            $("#barname").text($("#username").val());
+            $("#name").modal("hide");
+        }
+        if(data.room==1){
+            updateRoom(roomname,username,roomstatus);
+            $("#room").modal("hide");
+        }
+        if(data.joinroom==1){
+            alert("Join phòng thành công ");
+        }
     })
     socket.on('user_online',function(data){
         $("span#count").text(data.count_user);
