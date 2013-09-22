@@ -45,7 +45,7 @@ var run = function(socket,request){
                     socket.join(items[0]._id);
                     roomid= items[0]._id;
                     conn.collection('chess').update({_id:o_id},{$set:{status:1,user2:username}});
-                    socket.emit('callback',{joinroom:1});
+                    socket.emit('callback',{joinroom:1,message:"Vào phòng thành công"});
                 }else{
                     socket.emit('callback',{message:"Phòng đã đầy"});
                 }
@@ -62,6 +62,7 @@ var run = function(socket,request){
         socket.on('disconnect',function(){
             if(count>0) count--;
             socket.broadcast.emit('user_online',{count_user:count});
+            conn.collection('user').update({username:username},{$set:{online:0}});
             console.log("disconnect");
             if(roomid!=0){
                 socket.leave(roomid);
@@ -80,28 +81,47 @@ var run = function(socket,request){
             console.log(data);
             conn.collection('user').find({username:data.username,password:data.password}).limit(1).toArray(function(err, items){
                 if(items[0]!=null){
-                    count++;
-                    socket.join(roomname);
-                    isJoin=1;
-                    username=data.username;
-                    socket.emit('user_online',{count_user:count,id:socket.id});
-                    socket.broadcast.emit('user_online',{count_user:count});
-                    socket.emit('callback',{login:1,message:"Đăng nhập thành công !"});
+                    if(item[0].online==0){
+                        count++;
+                        socket.join(roomname);
+                        isJoin=1;
+                        username=data.username;
+                        socket.emit('user_online',{count_user:count,id:socket.id});
+                        socket.broadcast.emit('user_online',{count_user:count});
+                        conn.collection('user').update({username:data.username},{$set:{online:1}});
+                        socket.emit('callback',{login:1,message:"Đăng nhập thành công !"});
+                    }else{
+                        socket.emit('callback',{message:"Tài khoản đã đang nhập !"});
+                    }
+
                 }else{
                     socket.emit('callback',{message:"Tài khoản hoặc mật khẩu không đúng !"});
                 }
             });
         })
-        socket.on('signin',function(data){
+        socket.on('register',function(data){
             var doc = {
                 'username': data.username,
                 'password': data.password,
-                'status': 0
+                'status': 0,
+                'online':1
             };
-            conn.collection('user').insert(doc, {safe:true}, function(err, result) {
-
-                socket.emit('callback',{singin:1,message:"Đăng ký thành công !"});
+            conn.collection('user').find({username:data.username,password:data.password}).limit(1).toArray(function(err, items){
+                if(items[0]!=null){
+                    socket.emit('callback',{register:0,message:"Tài khoản đã tồn tại !"});
+                }else{
+                    conn.collection('user').insert(doc, {safe:true}, function(err, result) {
+                        count++;
+                        socket.join(roomname);
+                        isJoin=1;
+                        username=data.username;
+                        socket.emit('user_online',{count_user:count,id:socket.id});
+                        socket.broadcast.emit('user_online',{count_user:count});
+                        socket.emit('callback',{register:1,message:"Đăng ký thành công !"});
+                    });
+                }
             });
+
 
         })
     }

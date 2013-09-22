@@ -1,5 +1,11 @@
 <?php
         session_start();
+        if($_POST['do']=="islogin"){
+             if($_SESSION['username']!=null)
+                 echo $_SESSION['username'];
+             else
+                 echo "no";
+        }
        if($_SESSION['username']!=null){
 
        }else{

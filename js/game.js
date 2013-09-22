@@ -12,12 +12,14 @@ $(function(){
     var roomname;
     var roomstatus="trống";
     $("#name").modal("show");
-    $("#singup").click(function(){
+    $("#register").click(function(){
         if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
-
+            username=$("#username").val().trim();
+            var password= hex_md5($("#password").val().trim());
+            socket.emit('register',{username:username,password:password});
         }
     })
-    $("#singin").click(function(){
+    $("#login").click(function(){
         if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
             username=$("#username").val().trim();
             var password= hex_md5($("#password").val().trim());
@@ -71,7 +73,11 @@ $(function(){
             $("#room").modal("hide");
         }
         if(data.joinroom==1){
-            alert("Join phòng thành công ");
+
+        }
+        if(data.register ==1 ){
+            $("#barname").text($("#username").val());
+            $("#name").modal("hide");
         }
     })
     socket.on('user_online',function(data){
