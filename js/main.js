@@ -55,23 +55,27 @@
             this.nowplayer=this.player;
             this.stage.enableMouseOver(10);
             this.stage.mouseMoveOutside = true;
-            var item = new Item(this._images.background,0,0);
-            this.stage.addChild(item);
-            var text = new Text("Cờ tướng online",10,10," 46px Patrick Hand ","black");
-            this.stage.addChild(text);
+            this.item_background = new Item(this._images.background,0,0);
+            this.stage.addChild(this.item_background);
+            this.item_board = new Item(this._images.board,0,0);
+            this.item_board.scaleX=1.5;
+            this.item_board.scaleY=0.8;
+            this.stage.addChild( this.item_board);
+            this.text_board = new Text("Cờ tướng online",10,10," 46px Patrick Hand ","black");
+            this.stage.addChild(this.text_board);
             socket.on('room',function(data){
                 var text = new Text(data,100,100,"46px Patrick Hand ","black");
                 stage.addChild(text);
-          })
-            var add = this.dom('listroom',100,-400);
-            this.domelement.addChild(add);
-            var add = this.dom('add',100,-50);
-            this.domelement.addChild(add);
-            var add = this.dom('auto',250,-50);
-            this.domelement.addChild(add);
+            })
+            this.dom_listroom= this.dom('listroom',100,-380);
+            this.domelement.addChild(this.dom_listroom);
+            this.dom_add = this.dom('add',100,-50);
+            this.domelement.addChild(this.dom_add);
+            this.dom_auto = this.dom('auto',250,-50);
+            this.domelement.addChild(this.dom_auto);
             stage.addChild(this.domelement);
-            var add = this.dom('chatroom',600,-480);
-            stage.addChild(add) ;
+            this.dom_chatroom = this.dom('chatroom',600,-480);
+            stage.addChild(this.dom_chatroom) ;
 //            this.chess();
             createjs.Sound.registerPlugin(createjs.HTMLAudioPlugin);
             createjs.Ticker.addListener(this);
@@ -485,7 +489,8 @@
         pawn_dark:"images/pawn_dark.png",
         pawn_red:"images/pawn_red.png",
         rook_red:"images/rook_red.png",
-        rook_dark:"images/rook_dark.png"
+        rook_dark:"images/rook_dark.png",
+        board:"images/bang_go.png"
 
 
     };

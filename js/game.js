@@ -1,6 +1,7 @@
 var socket = io.connect('https://chat-nodejs-c9-nobody122.c9.io');
 function addRoom(id){
-    if(id==null) alert("Gặp lỗi, không thể vào phòng ");
+    if(id==null)
+        alert("Không thể vào phòng ");
     else{
         socket.emit('joinroom',{id:id});
     }
@@ -13,7 +14,7 @@ $(function(){
     var roomstatus="trống";
     var canvas=document.getElementById("canvas");
     var stage = new createjs.Stage(canvas);
-    var game= new  Game(canvas,stage,socket);
+    var game= new Game(canvas,stage,socket);
     $("#name").modal("show");
     $("#register").click(function(){
         if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
@@ -29,7 +30,6 @@ $(function(){
             username=$("#username").val().trim();
             var password= hex_md5($("#password").val().trim());
             socket.emit('login',{username:username,password:password});
-
         }else{
             alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
         }
@@ -45,10 +45,10 @@ $(function(){
     function updateRoom(r,u,s,id){
         if(id!=null)
         $("<tr reg='room'><td reg='name'>"+r+"</td><td>"+u+"</td><td>" +
-            "<a onclick=\"addRoom('"+id+"')\">Vào phòng</a></td></tr>").hide().appendTo("#listroom table").fadeIn(1000);
+            "<a class='btn' onclick=\"addRoom('"+id+"')\">Vào phòng</a></td></tr>").hide().appendTo("#listroom table").fadeIn(1000);
         else
             $("<tr reg='room'><td reg='name'>"+r+"</td><td>"+u+"</td><td>" +
-                "<a onclick=\"addRoom()\">Vào phòng</a></td></tr>").hide().appendTo("#listroom table").fadeIn(1000);
+                "<a class='btn' onclick=\"addRoom()\">Vào phòng</a></td></tr>").hide().appendTo("#listroom table").fadeIn(1000);
     }
     function updateMessage(m){
         $("#content ul").append(m);
@@ -72,26 +72,35 @@ $(function(){
         if(data.login==1){
             $("#barname").text($("#username").val());
             $("#name").modal("hide");
+        }else if(data.login==0){
         }
         if(data.room==1){
-            updateRoom(roomname,username,roomstatus);
+            game.domelement.visible=0;
+//            updateRoom(roomname,username,roomstatus);
             $("#room").modal("hide");
+        } else if(data.room==0) {
         }
         if(data.joinroom==1){
             game.domelement.visible=0;
             game.chess();
+        } else if(data.joinroom==0){
         }
         if(data.register ==1 ){
             $("#barname").text($("#username").val());
             $("#name").modal("hide");
+        }else if(data.register==0){
         }
         if(data.userin==1){
-            game.domelement.visible=0;
+//            game.domelement.visible=0;
             game.chess();
+        }else if(data.userin==0){
+
         }
         if(data.userout==1){
             game.tablechess.visible=0;
             game.domelement.visible=1;
+        }else if(data.userout==0){
+
         }
     })
     socket.on('user_online',function(data){
@@ -151,5 +160,4 @@ $(function(){
             canvas.style.height = 480 * optimalRatio + "px";
         }
     }
-
 })
