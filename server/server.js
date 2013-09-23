@@ -12,6 +12,15 @@ var conn = mongo.db('admin:trung18082016@paulo.mongohq.com:10040/quac');
 var server      = http.createServer().listen(port, ip, function(){console.log('Server running at %s:%s', ip, port)})
 var io          = socketIO.listen(server);
 var count=0;
+conn.collection('user').find({}).toArray(function(err, items){
+    if(items!=null)
+        for(var i=0;i<items.length;i++){
+            if(items[i].online==1){
+                conn.collection('user').update({username:items[i].username},{$set:{online:0}});
+            }
+        }
+
+})
 var run = function(socket,request){
     var username;
     var roomname='public';
@@ -45,8 +54,9 @@ var run = function(socket,request){
                 roomid= items[0]._id;
                 conn.collection('chess').update({_id:o_id},{$set:{status:1,user2:username}});
                 socket.emit('callback',{joinroom:1,message:"Vào phòng thành công"});
+                socket.broadcast.to(roomid).emit('callback',{userin:1,message:"Người chơi "+username+" đã vào phòng "});
             }else{
-                socket.emit('callback',{message:"Phòng đã đầy"});
+                socket.emit('callback',{joinroom:0,message:"Phòng đã đầy"});
             }
         });
 
@@ -65,13 +75,14 @@ var run = function(socket,request){
         conn.collection('user').update({username:username},{$set:{online:0}});
         console.log("disconnect");
         if(roomid!=0){
-            socket.leave(roomid);
-            var BSON = mongo.BSONPure;
-            var o_id = new BSON.ObjectID(roomid);
-            conn.collection('chess').update({_id:o_id},{$set:{status:0}});
-            setTimeout(function() {
-
-            }, 30000);
+            console.log(roomid);
+            if(roomid.length==24){
+                socket.leave(roomid);
+                var BSON = mongo.BSONPure;
+                var o_id = new BSON.ObjectID(roomid);
+                conn.collection('chess').update({_id:o_id},{$set:{status:0}});
+            }
+            socket.broadcast.to(roomid).emit('callback',{userout:1,message:"Đối phương mất kết nối !"});
         }else{
             socket.leave(roomname);
         }
@@ -91,11 +102,11 @@ var run = function(socket,request){
                     conn.collection('user').update({username:data.username},{$set:{online:1}});
                     socket.emit('callback',{login:1,message:"Đăng nhập thành công !"});
                 }else{
-                    socket.emit('callback',{message:"Tài khoản đang được sử dụng !"});
+                    socket.emit('callback',{login:0,message:"Tài khoản đang được sử dụng !"});
                 }
 
             }else{
-                socket.emit('callback',{message:"Tài khoản hoặc mật khẩu không đúng !"});
+                socket.emit('callback',{login:0,message:"Tài khoản hoặc mật khẩu không đúng !"});
             }
         });
     })

@@ -1,4 +1,5 @@
 var socket = io.connect('https://chat-nodejs-c9-nobody122.c9.io');
+//            var socket=io.connect('127.0.0.1:8080');
 function addRoom(id){
     if(id==null)
         alert("Không thể vào phòng ");
@@ -66,7 +67,6 @@ $(function(){
                 }
             }
         });
-//            var socket=io.connect('127.0.0.1:8080');
     socket.on('callback',function(data){
        if(data.message!=null) alert(data.message);
         if(data.login==1){
