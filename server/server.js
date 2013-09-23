@@ -19,7 +19,6 @@ conn.collection('user').find({}).toArray(function(err, items){
                 conn.collection('user').update({username:items[i].username},{$set:{online:0}});
             }
         }
-
 })
 var run = function(socket,request){
     var username;
@@ -62,9 +61,9 @@ var run = function(socket,request){
 
     })
     socket.on('message',function(data){
-        console.log(data.message);
         if(roomid!=0){
-            socket.broadcast.to(roomid).emit('message',{message:data.message});
+            if(data.message!=null)  socket.broadcast.to(roomid).emit('message',{message:data.message});
+            if(data.userout==1) socket.leave(roomid);
         }
         else
             socket.broadcast.to(roomname).emit('message',{message:data.message});

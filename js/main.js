@@ -6,20 +6,8 @@
             console.log(data);
         })
         var countpress=0;
-        var chessArray=
-            [   [6,4,2,3,10,3,2,4,6],
-                [0,0,0,0,0,0,0,0,0],
-                [0,5,0,0,0,0,0,5,0],
-                [1,0,1,0,1,0,1,0,1],
-                [0,0,0,0,0,0,0,0,0],
-                [0,0,0,0,0,0,0,0,0],
-                [-1,0,-1,0,-1,0,-1,0,-1],
-                [0,-5,0,0,0,0,0,-5,0],
-                [0,0,0,0,0,0,0,0,0],
-                [-6,-4,-2,-3,-10,-3,-2,-4,-6]
-            ];
+        var chessArray;
         var chessBitmap=[];
-        var vichess=[];
         var self=this;
         this.canvas=canvas;
         this.stage = stage;
@@ -61,7 +49,7 @@
             this.item_board.scaleX=1.5;
             this.item_board.scaleY=0.8;
             this.stage.addChild( this.item_board);
-            this.text_board = new Text("Cờ tướng online",10,10," 46px Patrick Hand ","black");
+            this.text_board = new Text("Cờ tướng online",10,10," 40px Patrick Hand ","black");
             this.stage.addChild(this.text_board);
             socket.on('room',function(data){
                 var text = new Text(data,100,100,"46px Patrick Hand ","black");
@@ -71,10 +59,9 @@
             this.domelement.addChild(this.dom_listroom);
             this.dom_add = this.dom('add',100,-50);
             this.domelement.addChild(this.dom_add);
-            this.dom_auto = this.dom('auto',250,-50);
+            this.dom_auto = this.dom('auto',220,-50);
             this.domelement.addChild(this.dom_auto);
-            stage.addChild(this.domelement);
-            this.dom_type = this.dom('type',350,-50);
+            this.dom_type = this.dom('type',380,-50);
             this.domelement.addChild(this.dom_type);
             stage.addChild(this.domelement);
             this.dom_chatroom = this.dom('chatroom',600,-480);
@@ -98,8 +85,20 @@
                 this.isSelect=0;
             }
         }
-        this.chess=function(array){
-            if(array==null) array=chessArray;
+        this.chess=function(){
+            chessBitmap=[];
+            chessArray=
+                [   [6,4,2,3,10,3,2,4,6],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,5,0,0,0,0,0,5,0],
+                    [1,0,1,0,1,0,1,0,1],
+                    [0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [-1,0,-1,0,-1,0,-1,0,-1],
+                    [0,-5,0,0,0,0,0,-5,0],
+                    [0,0,0,0,0,0,0,0,0],
+                    [-6,-4,-2,-3,-10,-3,-2,-4,-6]
+                ];
             var item = new Item(this._images.table,100,50);
             item.scaleX=0.8 ;
             item.scaleY=0.8;
@@ -108,7 +107,7 @@
             item.scaleX=0.8 ;
             item.scaleY=0.8;
             this.tablechess.addChild(item);
-            this.loadChess(array);
+            this.loadChess(chessArray);
         }
         this.loadChess=function(chessArr){
             for(var i=0;i<10;i++){
@@ -168,9 +167,10 @@
                 var self=this;
                 this._images[src].onload = function() {
                     if (++loadedImages >= numImages) {
+                        $("#loading").modal('hide');
                        callback();
-                        console.log("Load complete");
                     }else{
+                        $("#loading").modal('show');
                     }
                 };
                 this._images[src].src = res[src];
@@ -191,7 +191,7 @@
             if(self.nowplayer.color/this.count>0){
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
-                        self.stage.removeChild(self.chessrush[i]);
+                        self.tablechess.removeChild(self.chessrush[i]);
                     }
                     self.chessrush=new Array();
                 }
@@ -210,6 +210,7 @@
                        case 5: CannonMove(this);break;
                        case 6: RookMove(this);break;
                    }
+//                   console.log(self.chessrush);
                    this.ispress=1;
                }else{
                    self.isSelect=0;
@@ -371,6 +372,7 @@
                 for(var i=0;i<3;i++){
                     for(var j=3;j<6;j++){
                         if(Math.pow(i-chess.page.y,2)+Math.pow(j-chess.page.x,2)==1){
+
                             if(chessArray[i][j]<=0){
                                 vitualchess(chess,i,j);
                             }
@@ -408,7 +410,6 @@
             if(chess.count<0){
                 for(var i=chess.page.y;i>-1;i--){
                     for(var j=0;j<9;j++){
-
                             if(Math.pow(i-chess.page.y,2)+Math.pow(j-chess.page.x,2)==1){
                                 if(chessArray[i][j]>=0){
                                     if(i<=4)
@@ -437,6 +438,16 @@
                     }
                 }
             }
+
+        }
+        function FuckKing(chess){
+             for(var i=0;i<10;i++){
+                 for(var j=0;j<9;j++){
+                         if(Math.abs(chessArray[i][j])==10){
+
+                         }
+                 }
+             }
         }
         function vitualchess(chess,i,j){
             var myObjTwo = jQuery.extend(true, {}, chess);
@@ -448,6 +459,11 @@
             myObjTwo.alpha=0.4;
             myObjTwo.page={x:j,y:i};
             myObjTwo.selfmain=self;
+            if(Math.abs(chessArray[i][j])==10){
+                myObjTwo.isFuckKing=1;
+            }else{
+                myObjTwo.isFuckKing=0;
+            }
             myObjTwo.mousepress=function(){
                 socket.emit("chess",{
                     from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
@@ -466,13 +482,14 @@
                 chessArray[this.main.page.y][this.main.page.x]=this.main.count;
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
-                        self.tablechess.removeChild(self.chessrush[i]);
+                        this.selfmain.tablechess.removeChild(self.chessrush[i]);
                     }
-                    self.chessrush=new Array();
+                    this.selfmain.chessrush=new Array();
                 }
             }
             self.chessrush.push(myObjTwo);
             self.tablechess.addChild(myObjTwo);
+             return myObjTwo;
         }
     }
     var res = {
