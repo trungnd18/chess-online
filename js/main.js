@@ -24,7 +24,7 @@
         this.canvas=canvas;
         this.stage = stage;
         this.domelement= new createjs.Container();
-        this.tablechess=new craetejs.Container();
+        this.tablechess=new createjs.Container();
         this.ease =  createjs.Ease;
         this._sound={};
         this._images={};
@@ -96,11 +96,11 @@
             var item = new Item(this._images.table,100,50);
             item.scaleX=0.8 ;
             item.scaleY=0.8;
-            this.stage.addChild(item);
+            this.tablechess.addChild(item);
             var item = new Item(this._images.table_frame,80,30);
             item.scaleX=0.8 ;
             item.scaleY=0.8;
-            this.stage.addChild(item);
+            this.tablechess.addChild(item);
             this.loadChess(array);
         }
         this.loadChess=function(chessArr){
@@ -131,11 +131,12 @@
                         item.scaleY=0.5;
                         item.count= chessArr[i][j];
                         item.page={x:j,y:i};
-                        this.stage.addChild(item);
+                        this.tablechess.addChild(item);
                         chessBitmap[i+"|"+j]=item;
                     }
                 }
             }
+            stage.addChild(this.tablechess);
         }
         this.onLoad=function(callback){
             var i = 0, j = 0;
@@ -439,6 +440,7 @@
             myObjTwo.scaleY=0.5;
             myObjTwo.alpha=0.4;
             myObjTwo.page={x:j,y:i};
+            myObjTwo.selfmain=self;
             myObjTwo.mousepress=function(){
                 socket.emit("chess",{
                     from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
@@ -446,7 +448,7 @@
                 });
                 if(chessArray[this.page.y][this.page.x]!=0){
                     var tem= chessBitmap[this.page.y+"|"+this.page.x];
-                    stage.removeChild(tem);
+                    this.selfmain.tablechess.removeChild(tem);
                     chessBitmap[this.page.y+"|"+this.page.x]=null;
                 }
                 this.main.ispress=0;
@@ -457,13 +459,13 @@
                 chessArray[this.main.page.y][this.main.page.x]=this.main.count;
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
-                        self.stage.removeChild(self.chessrush[i]);
+                        self.tablechess.removeChild(self.chessrush[i]);
                     }
                     self.chessrush=new Array();
                 }
             }
             self.chessrush.push(myObjTwo);
-            self.stage.addChild(myObjTwo);
+            self.tablechess.addChild(myObjTwo);
         }
     }
     var res = {

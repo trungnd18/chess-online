@@ -79,7 +79,7 @@ $(function(){
         }
         if(data.joinroom==1){
             game.domelement.visible=0;
-              game.chess();
+            game.chess();
         }
         if(data.register ==1 ){
             $("#barname").text($("#username").val());
@@ -88,7 +88,9 @@ $(function(){
         if(data.userin==1){
             game.domelement.visible=0;
             game.chess();
-        }else{
+        }
+        if(data.userout==1){
+            game.tablechess.visible=0;
             game.domelement.visible=1;
         }
     })
