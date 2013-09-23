@@ -74,6 +74,9 @@
             this.dom_auto = this.dom('auto',250,-50);
             this.domelement.addChild(this.dom_auto);
             stage.addChild(this.domelement);
+            this.dom_type = this.dom('type',350,-50);
+            this.domelement.addChild(this.dom_type);
+            stage.addChild(this.domelement);
             this.dom_chatroom = this.dom('chatroom',600,-480);
             stage.addChild(this.dom_chatroom) ;
 //            this.chess();

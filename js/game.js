@@ -28,6 +28,8 @@ $(function(){
     })
     $("#login").click(function(){
         if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
+            $("#name").modal("hide");
+            $("#loading").modal("show");
             username=$("#username").val().trim();
             var password= hex_md5($("#password").val().trim());
             socket.emit('login',{username:username,password:password});
@@ -37,6 +39,8 @@ $(function(){
     }) ;
     $("#createroom").click(function(){
         if($("#nameroom").val().trim().length>=4){
+            $("#room").modal("hide");
+            $("#loading").modal("show");
             roomname=$("#nameroom").val();
             socket.emit("createroom",{room:roomname});
         }else{
@@ -68,17 +72,21 @@ $(function(){
             }
         });
     socket.on('callback',function(data){
-       if(data.message!=null) alert(data.message);
         if(data.login==1){
+            $("#loading").modal("hide");
             $("#barname").text($("#username").val());
-            $("#name").modal("hide");
         }else if(data.login==0){
+            $("#loading").modal("hide");
+            $("#name").modal("show");
         }
         if(data.room==1){
             game.domelement.visible=0;
 //            updateRoom(roomname,username,roomstatus);
+            $("#loading").modal("hide");
             $("#room").modal("hide");
         } else if(data.room==0) {
+            $("#loading").modal("hide");
+            $("#room").modal("show");
         }
         if(data.joinroom==1){
             game.domelement.visible=0;
@@ -102,6 +110,7 @@ $(function(){
         }else if(data.userout==0){
 
         }
+        if(data.message!=null) alert(data.message);
     })
     socket.on('user_online',function(data){
         $("span#count").text(data.count_user);
