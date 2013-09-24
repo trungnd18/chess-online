@@ -56,7 +56,6 @@
         this.x = x;
         this.y = y;
         this.ispress=0;
-        console.log(this);
     }
     Text.prototype.onPress=function(e){
 
