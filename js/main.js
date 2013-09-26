@@ -71,6 +71,8 @@
             }
         }
         this.chess=function(){
+            this._sound.theme.pause();
+            this._sound.theme1.play();
             chessBitmap=[];
             chessArray=
                 [   [6,4,2,3,10,3,2,4,6],
@@ -594,8 +596,13 @@
 
     };
     var res2 = {
-        theme:"sound/CoTuong.ogg",
+        theme:"sound/kingdom.ogg",
+        theme1:"sound/CoTuong.ogg",
         move:"sound/ChessMove.ogg",
+        cannon:"sound/Cannon.ogg",
+        cavalry:"sound/Cavalry.ogg",
+        elephan:"sound/Elephant.ogg",
+        general:"sound/General.ogg",
         click:"sound/Click.ogg"
 
     };
