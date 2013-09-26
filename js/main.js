@@ -183,6 +183,7 @@
                 this.scaleX=0.5;
                 this.scaleY=0.5;
                if(!this.ispress){
+                   self._sound.click.play();
                    self.isSelect=1;
                    self.movefrom=this.page;
                    self.dfchess=this;
@@ -532,7 +533,7 @@
             myObjTwo.page={x:j,y:i};
             myObjTwo.selfmain=self;
             myObjTwo.mousepress=function(){
-                self._sound.move.play(s);
+                self._sound.move.play();
                 var future= vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y}) ;
                 if(this.count*future>0){
                     console.log("Bị chiếu");
