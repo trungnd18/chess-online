@@ -5,6 +5,22 @@
         socket.on('online',function(data){
             console.log(data);
         })
+        socket.on('callback',function(data){
+            if(data.checkmate==1){
+                self.item_checkmate=new Item(self._images.checkmate,0,0);
+                self.stage.addChild(self.item_checkmate);
+                var refreshIntervalId=setInterval(function(){
+                    if(self.item_checkmate.alpha<0){
+                        clearInterval(refreshIntervalId);
+                    }else{
+                        self.item_checkmate.alpha-=0.1;
+                    }
+                },100);
+            }
+            if(data.move==1){
+                console.log(data);
+            }
+        })
         var countpress=0;
         var chessArray;
         var chessBitmap=[];
@@ -146,16 +162,21 @@
 
             for (var src in res2) {
                 this._sound[src] = new Audio();
+                this._sound[src].onload = function() {
+                    if (++loadedSounds >= numSounds) {
+                        console.log("LoadComplete");
+                    }else{
+                    }
+                };
                 this._sound[src].src = res2[src];
             }
             for (var src in res) {
 
                 this._images[src] = new Image();
-                var self=this;
                 this._images[src].onload = function() {
                     if (++loadedImages >= numImages) {
                         $("#loading").modal('hide');
-                       callback();
+                        callback();
                     }else{
                         $("#loading").modal('show');
                     }
@@ -538,10 +559,10 @@
                 self._sound.move.play();
                 var future= vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y}) ;
                 if(this.count*future>0){
-                    console.log("Bị chiếu");
+                    alert("Không thể đi");
                 }
                 if(this.count*future<0){
-                    console.log("Chiếu");
+                   socket.emit("chess",{checkmate:1});
                 }
                 socket.emit("chess",{
                     from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
@@ -591,7 +612,8 @@
         pawn_red:"images/pawn_red.png",
         rook_red:"images/rook_red.png",
         rook_dark:"images/rook_dark.png",
-        board:"images/bang_go.png"
+        board:"images/bang_go.png",
+        checkmate:"images/chieu.png"
 
 
     };
