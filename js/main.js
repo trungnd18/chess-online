@@ -16,21 +16,6 @@
         this.ease =  createjs.Ease;
         this._sound={};
         this._images={};
-        this.canvas.onmousemove = canvas_mousemove;
-        this.canvas.onmousedown=canvas_mousedown;
-        this.canvas.onmouseup=canvas_mouseup;
-        function canvas_mousemove(e) {
-            targetX = e.pageX - canvas.offsetLeft;
-            targetY = e.pageY - canvas.offsetTop;
-        }
-        function canvas_mousedown(e){
-            targetX = e.pageX - canvas.offsetLeft;
-            targetY = e.pageY - canvas.offsetTop;
-        }
-        function canvas_mouseup(e){
-            targetX = e.pageX - canvas.offsetLeft;
-            targetY = e.pageY - canvas.offsetTop;
-        }
         this.onStart=function(){
             this.isSelect=0;
             this.isMove=0;
@@ -210,7 +195,7 @@
                        case 5: CannonMove(this);break;
                        case 6: RookMove(this);break;
                    }
-//                   console.log(self.chessrush);
+
                    this.ispress=1;
                }else{
                    self.isSelect=0;
@@ -226,21 +211,26 @@
                     if((chess.page.x-j)*(chess.page.x-j)+(chess.page.y-i)*(chess.page.y-i)==5){
                         for(var ik=0;ik<10;ik++){
                             for(var jk=0;jk<9;jk++){
-                                var temp=(jk-chess.page.x)*(jk-chess.page.x)+(ik-chess.page.y)*(ik-chess.page.y);
-                                var temp1=(4*jk-3*chess.page.x-j)*(4*jk-3*chess.page.x-j)
-                                    +(4*ik-3*chess.page.y-i)*(4*ik-3*chess.page.y-i);
+                                if(isKing!=1){
+                                    var temp=Math.pow(jk-chess.page.x,2)+Math.pow(ik-chess.page.y,2);
+                                    var temp1=Math.pow(4*jk-3*chess.page.x-j,2)+Math.pow(4*ik-3*chess.page.y-i,2);
+                                }else if(isKing==1){
+                                    var temp=Math.pow(jk-j,2)+Math.pow(ik-i,2);
+                                    var temp1=Math.pow(4*jk-3*j-chess.page.x,2)+Math.pow(4*ik-3*i-chess.page.y,2);
+                                }
                                 if(temp==1&&temp1==5){
                                     if(chessArray[ik][jk]==0){
                                         if(chessArray[i][j]==0||chessArray[i][j]/chess.count<0)   {
                                            if(isKing==1&&Math.abs(chessArray[i][j])==4){
                                                 return 1;
                                            }else{
-                                               vitualchess(chess,i,j);
+                                               if(isKing!=1) vitualchess(chess,i,j);
                                            }
                                         }
 
                                     }
                                 }
+
                             }
                         }
                     }
@@ -256,8 +246,10 @@
                     if(chessArray[k][chess.page.x]/chess.count<0) {
                          if(isKing==1&&Math.abs(chessArray[k][chess.page.x])==6)
                               return 1;
-                         else
-                             vitualchess(chess,k,chess.page.x);
+                         else   {
+                             if(isKing!=1) vitualchess(chess,k,chess.page.x);
+                                 }
+
                     }
                     break;
                 }
@@ -269,8 +261,10 @@
                     if(chessArray[k][chess.page.x]/chess.count<0)   {
                         if(isKing==1&&Math.abs(chessArray[k][chess.page.x])==6)
                             return 1;
-                        else
-                            vitualchess(chess,k,chess.page.x);
+                        else   {
+                            if(isKing!=1)  vitualchess(chess,k,chess.page.x);
+                        }
+
                     }
                     break ;
                 }
@@ -282,8 +276,10 @@
                     if(chessArray[chess.page.y][k]/chess.count<0)  {
                         if(isKing==1&&Math.abs(chessArray[chess.page.y][k])==6)
                               return 1;
-                        else
-                            vitualchess(chess,chess.page.y,k);
+                        else  {
+                            if(isKing!=1) vitualchess(chess,chess.page.y,k);
+                        }
+
                     }
                     break;
                 }
@@ -295,8 +291,9 @@
                     if(chessArray[chess.page.y][k]/chess.count<0){
                         if(isKing==1&&Math.abs(chessArray[chess.page.y][k])==6)
                             return 1;
-                        else
-                            vitualchess(chess,chess.page.y,k);
+                        else {
+                            if(isKing!=1) vitualchess(chess,chess.page.y,k);
+                        }
                     }
                     break;
                 }
@@ -306,16 +303,15 @@
         function CannonMove(chess,isKing){
             for(var k=chess.page.y+1;k<10;k++){
                 if(chessArray[k][chess.page.x]==0){
-                    if(isKing!=1)vitualchess(chess,k,chess.page.x);
+                    if(isKing!=1) vitualchess(chess,k,chess.page.x);
                 }else{
                     for(var m=k+1;m<10;m++){
-                        if(chessArray[m][chess.page.x]!=0&&chessArray[m][chess.page.x]/chess.count<0){
+                        if(chessArray[m][chess.page.x]*chess.count>0) break;
+                        else if(chessArray[m][chess.page.x]*chess.count<0){
                             if(Math.abs(chessArray[m][chess.page.x])==5&&isKing==1) return 1;
-                            else{
-                                if(isKing!=1) vitualchess(chess,m,chess.page.x);
-                                break;
-                            }
-
+                            else
+                            if(isKing!=1) vitualchess(chess,m,chess.page.x);
+                            break;
                         }
                     }
                     break;
@@ -326,12 +322,12 @@
                     if(isKing!=1) vitualchess(chess,k,chess.page.x);
                 }else{
                     for(var m=k-1;m>-1;m--){
-                        if(chessArray[m][chess.page.x]!=0&&chessArray[m][chess.page.x]/chess.count<0){
+                        if(chessArray[m][chess.page.x]*chess.count>0) break;
+                        else if(chessArray[m][chess.page.x]*chess.count<0){
                             if(Math.abs(chessArray[m][chess.page.x])==5&&isKing==1) return 1;
-                            else  {
+                            else
                                 if(isKing!=1) vitualchess(chess,m,chess.page.x);
-                                break;
-                            }
+                            break;
                         }
                     }
                     break;
@@ -342,12 +338,12 @@
                     if(isKing!=1) vitualchess(chess,chess.page.y,k);
                 }else{
                     for(var m=k+1;m<9;m++){
-                        if(chessArray[chess.page.y][m]!=0&&chessArray[chess.page.y][m]/chess.count<0){
+                        if(chessArray[chess.page.y][m]*chess.count>0) break;
+                        else if(chessArray[chess.page.y][m]*chess.count<0){
                             if(Math.abs(chessArray[chess.page.y][m])==5&&isKing==1) return 1;
-                            else {
-                                if(isKing!=1) vitualchess(chess,chess.page.y,m);
-                                break;
-                            }
+                            else
+                            if(isKing!=1) vitualchess(chess,chess.page.y,m);
+                            break;
                         }
                     }
                     break;
@@ -358,12 +354,12 @@
                     if(isKing!=1) vitualchess(chess,chess.page.y,k);
                 }else{
                     for(var m=k-1;m>-1;m--){
-                        if(chessArray[chess.page.y][m]!=0&&chessArray[chess.page.y][m]/chess.count<0){
+                        if(chessArray[chess.page.y][m]*chess.count>0) break;
+                        else if(chessArray[chess.page.y][m]*chess.count<0){
                             if(Math.abs(chessArray[chess.page.y][m])==5&&isKing==1) return 1;
-                            else {
-                                if(isKing!=1) vitualchess(chess,chess.page.y,m);
-                                break;
-                            }
+                            else
+                            if(isKing!=1) vitualchess(chess,chess.page.y,m);
+                            break;
                         }
                     }
                     break;
@@ -403,10 +399,9 @@
                             if(chessArray[i][j]>=0){
                                 for(var k=i;k>0;k--){
                                     if(chessArray[k][j]!=10&&chessArray[k][j]!=0){
-                                      if(isKing!=1){
+                                      if(isKing!=1)
                                           vitualchess(chess,i,j);
                                           break;
-                                      }
                                     }else if(chessArray[k][j]==10){
                                         return 1;
                                     }
@@ -460,7 +455,7 @@
                 }
             }
         }
-        function PawnMove(chess,isKing){
+        function PawnMove(chess,isKing,array){
             if(chess.count<0){
                 for(var i=chess.page.y;i>-1;i--){
                     for(var j=0;j<9;j++){
@@ -469,9 +464,11 @@
                                     if(i<=4)   {
                                             if(isKing!=1) vitualchess(chess,i,j);
                                     }
-                                    else if(chess.page.y-i==1){
+                                    else{
                                         if(isKing==1&&Math.abs(chessArray[i][j])==1) return 1;
-                                        if(isKing!=1) vitualchess(chess,i,j);
+                                        if(chess.page.y-i==1){
+                                            if(isKing!=1) vitualchess(chess,i,j);
+                                        }
                                     }
                                 }
                             }
@@ -484,9 +481,11 @@
                                 if(chessArray[i][j]<=0){
                                     if(i>=5) {
                                             if(isKing!=1) vitualchess(chess,i,j);
-                                    } else if(i-chess.page.y==1){
+                                    } else{
                                         if(isKing==1&&Math.abs(chessArray[i][j])==1) return 1;
-                                        if(isKing!=1) vitualchess(chess,i,j);
+                                        if(i-chess.page.y==1){
+                                            if(isKing!=1) vitualchess(chess,i,j);
+                                        }
                                     }
                                 }
                             }
@@ -501,7 +500,7 @@
                          if(Math.abs(array[i][j])==10){
                              if(KnightMove(bitmap[i+"|"+j],1)||RookMove(bitmap[i+"|"+j],1)
                                  ||CannonMove(bitmap[i+"|"+j],1)||PawnMove(bitmap[i+"|"+j],1)) {
-                                 return 1;
+                                 return array[i][j]/10;
                              }
                          }
                  }
@@ -520,10 +519,7 @@
             var temm= bitmap[from.y+"|"+from.x];
             bitmap[from.y+"|"+from.x]=null;
             bitmap[to.y+"|"+to.x]=temm;
-            if(FuckKing(vitual,bitmap)){
-                return 1;
-            }
-            return 0;
+            return FuckKing(vitual,bitmap);
         }
         function vitualchess(chess,i,j){
             var myObjTwo = jQuery.extend(true, {}, chess);
@@ -535,14 +531,14 @@
             myObjTwo.alpha=0.4;
             myObjTwo.page={x:j,y:i};
             myObjTwo.selfmain=self;
-            if(Math.abs(chessArray[i][j])==10){
-                myObjTwo.isFuckKing=1;
-            }else{
-                myObjTwo.isFuckKing=0;
-            }
             myObjTwo.mousepress=function(){
-                if(vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y})){
-                    alert("Chiếu");
+                self._sound.move.play(s);
+                var future= vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y}) ;
+                if(this.count*future>0){
+                    console.log("Bị chiếu");
+                }
+                if(this.count*future<0){
+                    console.log("Chiếu");
                 }
                 socket.emit("chess",{
                     from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
@@ -567,10 +563,11 @@
                     }
                     this.selfmain.chessrush=new Array();
                 }
+
             }
             self.chessrush.push(myObjTwo);
             self.tablechess.addChild(myObjTwo);
-             return myObjTwo;
+            return myObjTwo;
         }
     }
     var res = {
@@ -596,6 +593,9 @@
 
     };
     var res2 = {
+        theme:"sound/CoTuong.ogg",
+        move:"sound/ChessMove.ogg",
+        click:"sound/Click.ogg"
 
     };
     window.Game = Game;

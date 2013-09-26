@@ -75,6 +75,8 @@ $(function(){
         });
     socket.on('callback',function(data){
         if(data.login==1){
+            game._sound.theme.loop=true;
+            game._sound.theme.play();
             $("#loading").modal("hide");
             $("#barname").text($("#username").val());
         }else if(data.login==0){
@@ -85,7 +87,7 @@ $(function(){
             game.tablechess.visible=1;
             game.domelement.visible=0;
             game.item_board.visible=1;
-//            updateRoom(roomname,username,roomstatus);
+            game.player= new Player(username,1,0);
             $("#loading").modal("hide");
             $("#room").modal("hide");
             game.text_board.text="Vui lòng chờ ..."
@@ -98,6 +100,7 @@ $(function(){
             game.tablechess.visible=1;
             game.item_board.visible=1;
             game.domelement.visible=0;
+            game.player= new Player(username,0,0);
             var s=10;
             var refreshIntervalId=setInterval(function(){
                 if(s>=0){

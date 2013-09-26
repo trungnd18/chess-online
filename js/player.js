@@ -1,9 +1,9 @@
 (function (window) {
 
-    function Player(images,score,name) {
-        this.images=images;
-        this.score=score;
+    function Player(name,position,score) {
         this.name=name;
+        this.position=position;
+        this.score=score;
         this.init=function(){
 
         }
