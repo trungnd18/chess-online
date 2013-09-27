@@ -18,7 +18,6 @@ $(function(){
     var canvas=document.getElementById("canvas");
     var stage = new createjs.Stage(canvas);
     var game= new Game(canvas,stage,socket);
-    $("#name").modal("show");
     $("#register").click(function(){
         if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
             username=$("#username").val().trim();
@@ -136,9 +135,7 @@ $(function(){
                     clearInterval(refreshIntervalId);
                 }
             },1000);
-
         }else if(data.userin==0){
-
         }
         if(data.userout==1){
             socket.emit("message",{userout:1});
@@ -150,6 +147,24 @@ $(function(){
             game.domelement.visible=1;
         }else if(data.userout==0){
 
+        }
+        if(data.checkmate==1){
+            if(game.item_checkmate!=null){
+                game.stage.removeChild(game.item_checkmate);
+            }
+            game.item_checkmate=new Item(game._images.checkmate,0,0);
+            game.stage.addChild(game.item_checkmate);
+
+            var refreshIntervalId=setInterval(function(){
+                if(game.item_checkmate.alpha<0){
+                    clearInterval(refreshIntervalId);
+                }else{
+                    game.item_checkmate.alpha-=0.1;
+                }
+            },100);
+        }
+        if(data.move==1){
+            console.log(data.data);
         }
         if(data.message!=null) console.log(data.message);
     })

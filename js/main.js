@@ -2,28 +2,9 @@
 
     function Game(canvas,stage,socket) {
         var socket=socket;
-        socket.on('online',function(data){
-            console.log(data);
-        })
-        socket.on('callback',function(data){
-            if(data.checkmate==1){
-                self.item_checkmate=new Item(self._images.checkmate,0,0);
-                self.stage.addChild(self.item_checkmate);
-                var refreshIntervalId=setInterval(function(){
-                    if(self.item_checkmate.alpha<0){
-                        clearInterval(refreshIntervalId);
-                    }else{
-                        self.item_checkmate.alpha-=0.1;
-                    }
-                },100);
-            }
-            if(data.move==1){
-                console.log(data);
-            }
-        })
         var countpress=0;
         var chessArray;
-        var chessBitmap=[];
+        var chessBitmap={};
         var self=this;
         this.canvas=canvas;
         this.stage = stage;
@@ -176,6 +157,7 @@
                 this._images[src].onload = function() {
                     if (++loadedImages >= numImages) {
                         $("#loading").modal('hide');
+                        $("#name").modal("show");
                         callback();
                     }else{
                         $("#loading").modal('show');
@@ -211,15 +193,14 @@
                    self.movefrom=this.page;
                    self.dfchess=this;
                    switch(Math.abs(this.count)){
-                       case 10: KingMove(this);break;
-                       case 1: PawnMove(this);break;
+                       case 10:KingMove(this,chessArray);break;
+                       case 1: PawnMove(this,chessArray);break;
                        case 2: ElephanMove(this);break;
                        case 3: BishopMove(this);break;
-                       case 4: KnightMove(this);break;
-                       case 5: CannonMove(this);break;
-                       case 6: RookMove(this);break;
+                       case 4: KnightMove(this,chessArray);break;
+                       case 5: CannonMove(this,chessArray);break;
+                       case 6: RookMove(this,chessArray);break;
                    }
-
                    this.ispress=1;
                }else{
                    self.isSelect=0;
@@ -229,7 +210,7 @@
                 alert("Không thể");
             }
        }
-        function KnightMove(chess,isKing){
+        function KnightMove(chess,chessArray,isKing){
             for(var i=0;i<10;i++){
                 for(var j=0;j<9;j++){
                     if((chess.page.x-j)*(chess.page.x-j)+(chess.page.y-i)*(chess.page.y-i)==5){
@@ -262,7 +243,7 @@
             }
             return 0;
         }
-        function RookMove(chess,isKing){
+        function RookMove(chess,chessArray,isKing){
             for(var k=chess.page.y+1;k<10;k++){
                 if(chessArray[k][chess.page.x]==0){
                     if(isKing!=1)vitualchess(chess,k,chess.page.x);
@@ -324,7 +305,7 @@
             }
             return 0;
         }
-        function CannonMove(chess,isKing){
+        function CannonMove(chess,chessArray,isKing){
             for(var k=chess.page.y+1;k<10;k++){
                 if(chessArray[k][chess.page.x]==0){
                     if(isKing!=1) vitualchess(chess,k,chess.page.x);
@@ -415,7 +396,7 @@
                }
            }
         }
-        function KingMove(chess,isKing){
+        function KingMove(chess,chessArray,isKing){
             if(chess.count<0){
                 for(var i=7;i<10;i++){
                     for(var j=3;j<6;j++){
@@ -423,8 +404,7 @@
                             if(chessArray[i][j]>=0){
                                 for(var k=i;k>0;k--){
                                     if(chessArray[k][j]!=10&&chessArray[k][j]!=0){
-                                      if(isKing!=1)
-                                          vitualchess(chess,i,j);
+                                      if(isKing!=1) vitualchess(chess,i,j);
                                           break;
                                     }else if(chessArray[k][j]==10){
                                         return 1;
@@ -479,7 +459,7 @@
                 }
             }
         }
-        function PawnMove(chess,isKing,array){
+        function PawnMove(chess,chessArray,isKing,array){
             if(chess.count<0){
                 for(var i=chess.page.y;i>-1;i--){
                     for(var j=0;j<9;j++){
@@ -522,8 +502,8 @@
              for(var i=0;i<10;i++){
                  for(var j=0;j<9;j++){
                          if(Math.abs(array[i][j])==10){
-                             if(KnightMove(bitmap[i+"|"+j],1)||RookMove(bitmap[i+"|"+j],1)
-                                 ||CannonMove(bitmap[i+"|"+j],1)||PawnMove(bitmap[i+"|"+j],1)) {
+                             if(KnightMove(bitmap[i+"|"+j],array,1)||RookMove(bitmap[i+"|"+j],array,1)
+                                 ||CannonMove(bitmap[i+"|"+j],array,1)||PawnMove(bitmap[i+"|"+j],array,1)) {
                                  return array[i][j]/10;
                              }
                          }
@@ -532,11 +512,11 @@
             return 0;
         }
         function vitualArray(from,to){
+
+            var vitual=[];
             var vitual = chessArray.slice(0);
-            var bitmap =[];
-            for( var x in chessBitmap){
-                bitmap[x]=chessBitmap[x];
-            }
+            var bitmap =jQuery.extend(true, {},chessBitmap);
+            console.log(bitmap);
             var temp=vitual[from.y][from.x];
             vitual[from.y][from.x]=0;
             vitual[to.y][to.x]=temp;
@@ -547,6 +527,7 @@
         }
         function vitualchess(chess,i,j){
             var myObjTwo = jQuery.extend(true, {}, chess);
+//            var myObjTwo = JSON.parse(JSON.stringify(chess));
             myObjTwo.main=chess;
             myObjTwo.x= 43*j+85;
             myObjTwo.y= 44*i+38;
@@ -556,41 +537,44 @@
             myObjTwo.page={x:j,y:i};
             myObjTwo.selfmain=self;
             myObjTwo.mousepress=function(){
+                console.log(chessArray);
                 self._sound.move.play();
                 var future= vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y}) ;
                 if(this.count*future>0){
                     alert("Không thể đi");
+                } else{
+                    if(this.count*future<0){
+                        socket.emit("chess",{checkmate:1});
+                    }
+                    socket.emit("chess",{
+                        from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
+                        to:{x:this.x,y:this.y,count:this.count,page:this.page}
+                    });
+                    if(chessArray[this.page.y][this.page.x]!=0){
+                        var tem= chessBitmap[this.page.y+"|"+this.page.x];
+                        this.selfmain.tablechess.removeChild(tem);
+                        chessBitmap[this.page.y+"|"+this.page.x]=null;
+                    }
+                    this.main.ispress=0;
+                    this.main.x=this.x;
+                    this.main.y=this.y;
+                    chessArray[this.main.page.y][this.main.page.x]=0;
+                    chessBitmap[this.main.page.y+"|"+this.main.page.x]=null;
+                    this.main.page=this.page;
+                    chessArray[this.main.page.y][this.main.page.x]=this.main.count;
+                    chessBitmap[this.page.y+"|"+this.page.x]=this.main;
                 }
-                if(this.count*future<0){
-                   socket.emit("chess",{checkmate:1});
-                }
-                socket.emit("chess",{
-                    from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
-                    to:{x:this.x,y:this.y,count:this.count,page:this.page}
-                });
-                if(chessArray[this.page.y][this.page.x]!=0){
-                    var tem= chessBitmap[this.page.y+"|"+this.page.x];
-                    this.selfmain.tablechess.removeChild(tem);
-                    chessBitmap[this.page.y+"|"+this.page.x]=null;
-                }
-                this.main.ispress=0;
-                this.main.x=this.x;
-                this.main.y=this.y;
-                chessArray[this.main.page.y][this.main.page.x]=0;
-                chessBitmap[this.main.page.y+"|"+this.main.page.x]=null;
-                this.main.page=this.page;
-                chessArray[this.main.page.y][this.main.page.x]=this.main.count;
-                chessBitmap[this.page.y+"|"+this.page.x]=this.main;
+
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
                         this.selfmain.tablechess.removeChild(self.chessrush[i]);
                     }
                     this.selfmain.chessrush=new Array();
                 }
-
             }
             self.chessrush.push(myObjTwo);
             self.tablechess.addChild(myObjTwo);
+
             return myObjTwo;
         }
     }
