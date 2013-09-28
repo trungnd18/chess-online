@@ -13,6 +13,7 @@
         this.ease =  createjs.Ease;
         this._sound={};
         this._images={};
+        /* Hàm khởi động */
         this.onStart=function(){
             this.isSelect=0;
             this.isMove=0;
@@ -22,6 +23,7 @@
             this.chessrush=new Array();
             this.player= new Player();
             this.player.color=1;
+            this.player.isPlay=0;
             this.nowplayer=this.player;
             this.stage.enableMouseOver(10);
             this.stage.mouseMoveOutside = true;
@@ -54,6 +56,7 @@
             createjs.Ticker.useRAF = true;
             createjs.Ticker.setFPS(60);
         }
+        /* Hàm load phần tử dom của html*/
         this.dom=function(id,x,y){
             var form = document.getElementById(id);
             var add = new createjs.DOMElement(form);
@@ -61,12 +64,14 @@
             add.y=y;
             return add;
         }
+        /* Hàm xử lý sự kiện*/
         this.tick=function(){
             this.stage.update();
             if(this.isSelect){
                 this.isSelect=0;
             }
         }
+        /*Hàm khởi tạo bàn cờ*/
         this.chess=function(){
             this._sound.theme.pause();
             this._sound.theme1.play();
@@ -93,6 +98,7 @@
             this.tablechess.addChild(item);
             this.loadChess(chessArray);
         }
+        /* Hàm load bàn cờ, dựng lên stage*/
         this.loadChess=function(chessArr){
             for(var i=0;i<10;i++){
                 for(var j=0;j<9;j++){
@@ -128,6 +134,7 @@
             }
             stage.addChild(this.tablechess);
         }
+        /* Hàm load image,sound  */
         this.onLoad=function(callback){
             var i = 0, j = 0;
             var loadedImages = 0;
@@ -166,9 +173,7 @@
                 this._images[src].src = res[src];
             }
         }
-        this.createMove=function(chess){
-            KnightMove(chess);
-        }
+         /*Xử lý thao tác chuột*/
         var mouseover=function(){
              this.scaleX=0.6;
             this.scaleY=0.6;
@@ -178,7 +183,9 @@
             this.scaleY=0.5;
         }
         var mousepress=function (evt){
-            if(1){
+            if(!self.player.isPlay&&self.player.color*this.count>0){
+
+                socket.emit('chess',{nextTurn:1}) ;
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
                         self.tablechess.removeChild(self.chessrush[i]);
@@ -207,10 +214,11 @@
                    this.ispress=0;
                }
             }else{
-                alert("Không thể");
+
             }
        }
-        function KnightMove(chess,chessArray,isKing){
+        /* Xử lý trạng thái bàn cờ*/
+        function KnightMove(chess,isKing){
             for(var i=0;i<10;i++){
                 for(var j=0;j<9;j++){
                     if((chess.page.x-j)*(chess.page.x-j)+(chess.page.y-i)*(chess.page.y-i)==5){
@@ -243,7 +251,7 @@
             }
             return 0;
         }
-        function RookMove(chess,chessArray,isKing){
+        function RookMove(chess,isKing){
             for(var k=chess.page.y+1;k<10;k++){
                 if(chessArray[k][chess.page.x]==0){
                     if(isKing!=1)vitualchess(chess,k,chess.page.x);
@@ -305,7 +313,7 @@
             }
             return 0;
         }
-        function CannonMove(chess,chessArray,isKing){
+        function CannonMove(chess,isKing){
             for(var k=chess.page.y+1;k<10;k++){
                 if(chessArray[k][chess.page.x]==0){
                     if(isKing!=1) vitualchess(chess,k,chess.page.x);
@@ -396,7 +404,7 @@
                }
            }
         }
-        function KingMove(chess,chessArray,isKing){
+        function KingMove(chess,isKing){
             if(chess.count<0){
                 for(var i=7;i<10;i++){
                     for(var j=3;j<6;j++){
@@ -459,7 +467,7 @@
                 }
             }
         }
-        function PawnMove(chess,chessArray,isKing,array){
+        function PawnMove(chess,isKing){
             if(chess.count<0){
                 for(var i=chess.page.y;i>-1;i--){
                     for(var j=0;j<9;j++){
@@ -498,12 +506,30 @@
             }
            return 0;
         }
+        /*Di chuyển quân cờ */
+        this.chessMove=function(from,to){
+            var chess= chessBitmap[from.page.y+"|"+from.page.x];
+            if(chessArray[to.page.y][to.page.x]!=0){
+                var tem= chessBitmap[to.page.y+"|"+to.page.x];
+                self.tablechess.removeChild(tem);
+                chessBitmap[to.page.y+"|"+to.page.x]=null;
+            }
+            chess.x=to.x;
+            chess.y=to.y;
+            chessArray[chess.page.y][chess.page.x]=0;
+            chessBitmap[chess.page.y+"|"+chess.page.x]=null;
+            chess.page=to.page;
+            chessArray[chess.page.y][chess.page.x]=from.count;
+            chessBitmap[to.page.y+"|"+to.page.x]=chess;
+            chess.ispress=0;
+        }
+        /*Dự đoạn trạng thái chiếu cờ*/
         function FuckKing(array,bitmap){
              for(var i=0;i<10;i++){
                  for(var j=0;j<9;j++){
                          if(Math.abs(array[i][j])==10){
-                             if(KnightMove(bitmap[i+"|"+j],array,1)||RookMove(bitmap[i+"|"+j],array,1)
-                                 ||CannonMove(bitmap[i+"|"+j],array,1)||PawnMove(bitmap[i+"|"+j],array,1)) {
+                             if(KnightMove(bitmap[i+"|"+j],1)||RookMove(bitmap[i+"|"+j],1)
+                                 ||CannonMove(bitmap[i+"|"+j],1)||PawnMove(bitmap[i+"|"+j],1)) {
                                  return array[i][j]/10;
                              }
                          }
@@ -516,7 +542,6 @@
             var vitual=[];
             var vitual = chessArray.slice(0);
             var bitmap =jQuery.extend(true, {},chessBitmap);
-            console.log(bitmap);
             var temp=vitual[from.y][from.x];
             vitual[from.y][from.x]=0;
             vitual[to.y][to.x]=temp;
@@ -525,6 +550,7 @@
             bitmap[to.y+"|"+to.x]=temm;
             return FuckKing(vitual,bitmap);
         }
+        /*Dựng nước cờ có thể đi*/
         function vitualchess(chess,i,j){
             var myObjTwo = jQuery.extend(true, {}, chess);
 //            var myObjTwo = JSON.parse(JSON.stringify(chess));
@@ -536,47 +562,50 @@
             myObjTwo.alpha=0.4;
             myObjTwo.page={x:j,y:i};
             myObjTwo.selfmain=self;
-            myObjTwo.mousepress=function(){
-                console.log(chessArray);
+            myObjTwo.onPress=function(){
                 self._sound.move.play();
-                var future= vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y}) ;
-                if(this.count*future>0){
-                    alert("Không thể đi");
-                } else{
-                    if(this.count*future<0){
-                        socket.emit("chess",{checkmate:1});
-                    }
-                    socket.emit("chess",{
-                        from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
-                        to:{x:this.x,y:this.y,count:this.count,page:this.page}
-                    });
-                    if(chessArray[this.page.y][this.page.x]!=0){
-                        var tem= chessBitmap[this.page.y+"|"+this.page.x];
-                        this.selfmain.tablechess.removeChild(tem);
-                        chessBitmap[this.page.y+"|"+this.page.x]=null;
-                    }
-                    this.main.ispress=0;
-                    this.main.x=this.x;
-                    this.main.y=this.y;
-                    chessArray[this.main.page.y][this.main.page.x]=0;
-                    chessBitmap[this.main.page.y+"|"+this.main.page.x]=null;
-                    this.main.page=this.page;
-                    chessArray[this.main.page.y][this.main.page.x]=this.main.count;
-                    chessBitmap[this.page.y+"|"+this.page.x]=this.main;
-                }
-
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
                         this.selfmain.tablechess.removeChild(self.chessrush[i]);
                     }
                     this.selfmain.chessrush=new Array();
                 }
+                var future= vitualArray({x:this.main.page.x,y:this.main.page.y},{x:this.page.x,y:this.page.y}) ;
+                if(this.count*future>0){
+                    alert("Đang bị chiếu không thể đi");
+                    chessArray[this.main.page.y][this.main.page.x]=chessArray[this.page.y][this.page.x];
+                    chessArray[this.page.y][this.page.x]=0;
+                    return ;
+                } else{
+                    var data= {from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
+                    to:{x:this.x,y:this.y,count:this.count,page:this.page}  }  ;
+                    socket.emit("chess",data);
+                    self.chessMove(data.from,data.to);
+                    self.player.isPlay=1;
+                    if(this.count*future<0){
+                        socket.emit("chess",{checkmate:1});
+                        if(self.item_checkmate!=null){
+                            self.stage.removeChild(self.item_checkmate);
+                        }
+                        self.item_checkmate=new Item(self._images.checkmate,0,0);
+                        self.stage.addChild(self.item_checkmate);
+
+                        var refreshIntervalId=setInterval(function(){
+                            if(self.item_checkmate.alpha<0){
+                                clearInterval(refreshIntervalId);
+                            }else{
+                                self.item_checkmate.alpha-=0.1;
+                            }
+                        },100);
+                    }
+                  }
             }
             self.chessrush.push(myObjTwo);
             self.tablechess.addChild(myObjTwo);
 
             return myObjTwo;
         }
+
     }
     var res = {
         background:"images/background.png",
@@ -602,13 +631,23 @@
 
     };
     var res2 = {
-        theme:"sound/kingdom.ogg",
+        theme:"sound/kingdomx`.ogg",
         theme1:"sound/CoTuong.ogg",
         move:"sound/ChessMove.ogg",
         cannon:"sound/Cannon.ogg",
         cavalry:"sound/Cavalry.ogg",
-        elephan:"sound/Elephant.ogg",
+        elephant:"sound/Elephant.ogg",
+        generalnext:"GeneralChecked.ogg",
         general:"sound/General.ogg",
+        guard:"sound/Guard.ogg",
+        rook:"sound/Rook.ogg",
+        soldier:"Soldier.ogg",
+        time:"TimeCount.ogg",
+        win:"Win.ogg",
+        lose:"Lose.ogg",
+        start:"StartGame.ogg",
+        draw:"Draw.ogg",
+        gun:"ShotgunBlast.ogg",
         click:"sound/Click.ogg"
 
     };

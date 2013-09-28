@@ -56,3 +56,23 @@ body{
     cursor:url(cursor.png),url(cursor.cur),pointer ;
     font: Patrick Hand SC;
 }
+#listroom{
+    height: 300px;
+    width: 300px;
+    overflow: auto;
+    background-color: aliceblue;
+    border: 2px solid #eaeaea;
+}
+#chatroom{
+    width:200px;
+    height: 480px;
+    border: 1px solid #eaeaea;
+    background-color: #eaeaea;
+}
+#chatroom #content{
+    height: 300px;
+    background: wheat;
+    overflow:auto;
+    color: white;
+    background-image: url(../images/bg_text_chat.jpg);
+}

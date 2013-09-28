@@ -73,20 +73,19 @@ $(function(){
             }
         });
     socket.on('callback',function(data){
-        if(data.login==1){
-            game._sound.theme.loop=true;
-            game._sound.theme.play();
+        if(data.login){
+//            game._sound.theme.loop=true;
+//            game._sound.theme.play();
             $("#loading").modal("hide");
             $("#barname").text($("#username").val());
         }else if(data.login==0){
             $("#loading").modal("hide");
             $("#name").modal("show");
         }
-        if(data.room==1){
+        if(data.room){
             game.tablechess.visible=1;
             game.domelement.visible=0;
             game.item_board.visible=1;
-            game.player= new Player(username,1,0);
             $("#loading").modal("hide");
             $("#room").modal("hide");
             game.text_board.text="Vui lòng chờ ..."
@@ -94,12 +93,12 @@ $(function(){
             $("#loading").modal("hide");
             $("#room").modal("show");
         }
-        if(data.joinroom==1){
+        if(data.joinroom){
             $("#"+roomid).remove();
+
             game.tablechess.visible=1;
             game.item_board.visible=1;
             game.domelement.visible=0;
-            game.player= new Player(username,0,0);
             var s=10;
             var refreshIntervalId=setInterval(function(){
                 if(s>=0){
@@ -110,22 +109,24 @@ $(function(){
                     game.text_board.visible=0;
                     stage.removeChild(game.tablechess);
                     game.chess();
+                    game.player.color=-1;
                     clearInterval(refreshIntervalId);
                 }
             },1000);
 
         } else if(data.joinroom==0){
         }
-        if(data.register ==1 ){
+        if(data.register ){
             $("#barname").text($("#username").val());
             $("#name").modal("hide");
         }else if(data.register==0){
         }
-        if(data.userin==1){
+        if(data.userin){
             var s=10;
             var refreshIntervalId = setInterval(function(){
                 if(s>=0){
                     game.text_board.text="Bắt đầu trong "+s+" giây";
+                    game._sound.time.play();
                     s--;
                 }else{
                     game.item_board.visible=0;
@@ -137,7 +138,7 @@ $(function(){
             },1000);
         }else if(data.userin==0){
         }
-        if(data.userout==1){
+        if(data.userout){
             socket.emit("message",{userout:1});
             game.tablechess.visible=0;
             stage.removeChild(game.tablechess);
@@ -146,9 +147,9 @@ $(function(){
             game.text_board.text="Cờ tướng online";
             game.domelement.visible=1;
         }else if(data.userout==0){
-
         }
-        if(data.checkmate==1){
+        if(data.checkmate){
+            console.log("Chiếu");
             if(game.item_checkmate!=null){
                 game.stage.removeChild(game.item_checkmate);
             }
@@ -163,10 +164,14 @@ $(function(){
                 }
             },100);
         }
-        if(data.move==1){
-            console.log(data.data);
+        if(data.move){
+            console.log(data);
+            game.chessMove(data.game.from,data.game.to);
         }
         if(data.message!=null) console.log(data.message);
+        if(data.nextTurn){
+               game.player.isPlay=0;
+        }
     })
     socket.on('user_online',function(data){
         $("span#count").text(data.count_user);
