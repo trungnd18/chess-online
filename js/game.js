@@ -132,7 +132,6 @@ $(function(){
                     game.text_board.visible=0;
                     stage.removeChild(game.tablechess);
                     game.chess();
-                    game.waitTurn();
                     clearInterval(refreshIntervalId);
                 }
             },1000);
@@ -149,7 +148,7 @@ $(function(){
         }else if(data.userout==0){
         }
         if(data.checkmate){
-            console.log("Chiếu");
+            game._sound.generalnext.play();
             if(game.item_checkmate!=null){
                 game.stage.removeChild(game.item_checkmate);
             }
@@ -171,7 +170,6 @@ $(function(){
         if(data.message!=null) console.log(data.message);
         if(data.nextTurn){
                game.player.isPlay=0;
-               game.waitTurn();
         }
     })
     socket.on('user_online',function(data){

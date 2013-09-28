@@ -511,7 +511,16 @@
         /*Di chuyển quân cờ */
         this.chessMove=function(from,to){
             var chess= chessBitmap[from.page.y+"|"+from.page.x];
-            if(chessArray[to.page.y][to.page.x]!=0){
+            if(Math.abs(chessArray[to.page.y][to.page.x])>0){
+                switch(Math.abs(chess.count)){
+                    case 1:self._sound.soldier.play();break;
+                    case 2:self._sound.elephant.play();break;
+                    case 3:self._sound.guard.play();break;
+                    case 4:self._sound.cavalry.play();break;
+                    case 5:self._sound.cannon.play();break;
+                    case 6:self._sound.rook.play();break;
+                    case 10:self._sound.general.play();break;
+                }
                 var tem= chessBitmap[to.page.y+"|"+to.page.x];
                 self.tablechess.removeChild(tem);
                 chessBitmap[to.page.y+"|"+to.page.x]=null;
@@ -644,7 +653,11 @@
         rook_red:"images/rook_red.png",
         rook_dark:"images/rook_dark.png",
         board:"images/bang_go.png",
-        checkmate:"images/chieu.png"
+        checkmate:"images/chieu.png",
+        avatar_0:"images/icon_rong.png",
+        avatar_1:"images/icon_ho.png",
+        avatar_2:"images/icon_phuong.png",
+        avatar_3:"images/icon_rua.png"
 
 
     };
@@ -659,13 +672,13 @@
         general:"sound/General.ogg",
         guard:"sound/Guard.ogg",
         rook:"sound/Rook.ogg",
-        soldier:"Soldier.ogg",
-        time:"TimeCount.ogg",
-        win:"Win.ogg",
-        lose:"Lose.ogg",
-        start:"StartGame.ogg",
-        draw:"Draw.ogg",
-        gun:"ShotgunBlast.ogg",
+        soldier:"sound/Soldier.ogg",
+        time:"sound/TimeCount.ogg",
+        win:"sound/Win.ogg",
+        lose:"sound/Lose.ogg",
+        start:"sound/StartGame.ogg",
+        draw:"sound/Draw.ogg",
+        gun:"sound/ShotgunBlast.ogg",
         click:"sound/Click.ogg"
 
     };
