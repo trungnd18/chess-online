@@ -25,6 +25,7 @@
             this.player.color=1;
             this.player.isPlay=0;
             this.nowplayer=this.player;
+            this.checkmate=0;
             this.stage.enableMouseOver(10);
             this.stage.mouseMoveOutside = true;
             this.item_background = new Item(this._images.background,0,0);
@@ -69,6 +70,9 @@
             this.stage.update();
             if(this.isSelect){
                 this.isSelect=0;
+            }
+            if(this.checkmate){
+
             }
         }
         /*Hàm khởi tạo bàn cờ*/
@@ -184,8 +188,6 @@
         }
         var mousepress=function (evt){
             if(!self.player.isPlay&&self.player.color*this.count>0){
-
-                socket.emit('chess',{nextTurn:1}) ;
                 if(!jQuery.isEmptyObject( self.chessrush)){
                     for(var i=0;i< self.chessrush.length;i++){
                         self.tablechess.removeChild(self.chessrush[i]);
@@ -577,6 +579,8 @@
                     chessArray[this.page.y][this.page.x]=0;
                     return ;
                 } else{
+                    socket.emit('chess',{nextTurn:1}) ;
+
                     var data= {from:{x:this.main.x,y:this.main.y,count:this.main.count,page:this.main.page},
                     to:{x:this.x,y:this.y,count:this.count,page:this.page}  }  ;
                     socket.emit("chess",data);
@@ -594,7 +598,7 @@
                             if(self.item_checkmate.alpha<0){
                                 clearInterval(refreshIntervalId);
                             }else{
-                                self.item_checkmate.alpha-=0.1;
+                                self.item_checkmate.alpha-=0.05;
                             }
                         },100);
                     }
@@ -605,7 +609,21 @@
 
             return myObjTwo;
         }
-
+        this.waitTurn=function(){
+            if(!this.player.isPlay){
+                var s=30;
+                var refreshIntervalId=setInterval(function(){
+                    if(s<=0||self.player.isPlay){
+                        self.player.isPlay=1;
+                        socket.emit('chess',{nextTurn:1});
+                        clearInterval(refreshIntervalId);
+                    }else{
+                        console.log(s);
+                        s--;
+                    }
+                },1000);
+            }
+        }
     }
     var res = {
         background:"images/background.png",
@@ -631,7 +649,7 @@
 
     };
     var res2 = {
-        theme:"sound/kingdomx`.ogg",
+        theme:"sound/kingdom.ogg",
         theme1:"sound/CoTuong.ogg",
         move:"sound/ChessMove.ogg",
         cannon:"sound/Cannon.ogg",

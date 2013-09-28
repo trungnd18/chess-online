@@ -95,7 +95,6 @@ $(function(){
         }
         if(data.joinroom){
             $("#"+roomid).remove();
-
             game.tablechess.visible=1;
             game.item_board.visible=1;
             game.domelement.visible=0;
@@ -133,6 +132,7 @@ $(function(){
                     game.text_board.visible=0;
                     stage.removeChild(game.tablechess);
                     game.chess();
+                    game.waitTurn();
                     clearInterval(refreshIntervalId);
                 }
             },1000);
@@ -171,6 +171,7 @@ $(function(){
         if(data.message!=null) console.log(data.message);
         if(data.nextTurn){
                game.player.isPlay=0;
+               game.waitTurn();
         }
     })
     socket.on('user_online',function(data){
