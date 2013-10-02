@@ -18,26 +18,26 @@ $(function(){
     var canvas=document.getElementById("canvas");
     var stage = new createjs.Stage(canvas);
     var game= new Game(canvas,stage,socket);
-    $("#register").click(function(){
-        if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
-            username=$("#username").val().trim();
-            var password= hex_md5($("#password").val().trim());
-            socket.emit('register',{username:username,password:password});
-        }else{
-            alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
-        }
-    })
-    $("#login").click(function(){
-        if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
-            $("#name").modal("hide");
-            $("#loading").modal("show");
-            username=$("#username").val().trim();
-            var password= hex_md5($("#password").val().trim());
-            socket.emit('login',{username:username,password:password});
-        }else{
-            alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
-        }
-    }) ;
+//    $("#register").click(function(){
+//        if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
+//            username=$("#username").val().trim();
+//            var password= hex_md5($("#password").val().trim());
+//            socket.emit('register',{username:username,password:password});
+//        }else{
+//            alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
+//        }
+//    })
+//    $("#login").click(function(){
+//        if($("#username").val().trim().length>3&&$("#password").val().trim().length>3){
+//            $("#name").modal("hide");
+//            $("#loading").modal("show");
+//            username=$("#username").val().trim();
+//            var password= hex_md5($("#password").val().trim());
+//            socket.emit('login',{username:username,password:password});
+//        }else{
+//            alert("Tài khoản hoặc mật khẩu không được nhỏ hơn 4 ký tự");
+//        }
+//    }) ;
     $("#createroom").click(function(){
         if($("#nameroom").val().trim().length>=4){
             $("#room").modal("hide");
@@ -86,32 +86,39 @@ $(function(){
             game.tablechess.visible=1;
             game.domelement.visible=0;
             game.item_board.visible=1;
+            game.text_user1.text=data.username;
+            game.id=data.roomid;
+            game.roomwait.visible=1;
             $("#loading").modal("hide");
             $("#room").modal("hide");
-            game.text_board.text="Vui lòng chờ ..."
+            game.text_board.text="Vui lòng chờ ...";
         } else if(data.room==0) {
             $("#loading").modal("hide");
             $("#room").modal("show");
         }
         if(data.joinroom){
             $("#"+roomid).remove();
+            game.text_user1.text=data.user1;
+            game.text_user2.text=data.user2;
+            game.item_avatar1.visible=1;
             game.tablechess.visible=1;
             game.item_board.visible=1;
             game.domelement.visible=0;
+            game.roomwait.visible=1;
             var s=10;
-            var refreshIntervalId=setInterval(function(){
-                if(s>=0){
-                    game.text_board.text="Bắt đầu trong "+s+" giây";
-                    s--;
-                }else{
-                    game.item_board.visible=0;
-                    game.text_board.visible=0;
-                    stage.removeChild(game.tablechess);
-                    game.chess();
-                    game.player.color=-1;
-                    clearInterval(refreshIntervalId);
-                }
-            },1000);
+//            var refreshIntervalId=setInterval(function(){
+//                if(s>=0){
+//                    game.text_board.text="Bắt đầu trong "+s+" giây";
+//                    s--;
+//                }else{
+//                    game.item_board.visible=0;
+//                    game.text_board.visible=0;
+//                    stage.removeChild(game.tablechess);
+//                    game.chess();
+//                    game.player.color=-1;
+//                    clearInterval(refreshIntervalId);
+//                }
+//            },1000);
 
         } else if(data.joinroom==0){
         }
@@ -122,23 +129,29 @@ $(function(){
         }
         if(data.userin){
             var s=10;
-            var refreshIntervalId = setInterval(function(){
-                if(s>=0){
-                    game.text_board.text="Bắt đầu trong "+s+" giây";
-                    game._sound.time.play();
-                    s--;
-                }else{
-                    game.item_board.visible=0;
-                    game.text_board.visible=0;
-                    stage.removeChild(game.tablechess);
-                    game.chess();
-                    clearInterval(refreshIntervalId);
-                }
-            },1000);
+            game.text_user2.text=data.user2;
+            game.item_avatar1.visible=1;
+            game.id=data.roomid;
+//            var refreshIntervalId = setInterval(function(){
+//                if(s>=0){
+//                    game.text_board.text="Bắt đầu trong "+s+" giây";
+//                    game._sound.time.play();
+//                    s--;
+//                }else{
+//                    game.item_board.visible=0;
+//                    game.text_board.visible=0;
+//                    stage.removeChild(game.tablechess);
+//                    game.chess();
+//                    clearInterval(refreshIntervalId);
+//                }
+//            },1000);
         }else if(data.userin==0){
         }
         if(data.userout){
             socket.emit("message",{userout:1});
+            game.roomwait.visible=0;
+            game.item_avatar1.visible=0;
+            game.text_user2.text="Trống";
             game.tablechess.visible=0;
             stage.removeChild(game.tablechess);
             game.item_board.visible=1;
@@ -170,6 +183,15 @@ $(function(){
         if(data.message!=null) console.log(data.message);
         if(data.nextTurn){
                game.player.isPlay=0;
+        }
+        if(data.listroom){
+            var rooms=data.rooms;
+            for(var oj in rooms){
+                updateRoom(rooms[oj].roomname,rooms[oj].user,"Trống",rooms[oj]._id);
+            }
+        }
+        if(data.start){
+
         }
     })
     socket.on('user_online',function(data){
